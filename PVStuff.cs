@@ -50,6 +50,8 @@ sealed class PVStuff : BaseUnityPlugin
 
     public void OnEnable()
     {
+        MainLogic.Startup();
+
         s_logger = Logger;
         On.RainWorld.OnModsInit += static (orig, self) =>
         {
