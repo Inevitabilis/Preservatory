@@ -18,26 +18,20 @@ public static class StaticStuff
         public static MenuScene.SceneID Spearmaster = new(nameof(Spearmaster) + tail, false);
         public static MenuScene.SceneID Survivor = new(nameof(Survivor) + tail, false);
         public static MenuScene.SceneID Monk = new(nameof(Monk) + tail, false);
-        public static MenuScene.SceneID Sofanthiel = new(nameof(Sofanthiel) + tail, false);
         public static MenuScene.SceneID Rivulet = new(nameof(Rivulet) + tail, false);
-        public static MenuScene.SceneID Saint = new(nameof(Saint) + tail, false);
         public static MenuScene.SceneID Hunter = new(nameof(Hunter) + tail, false);
-        public static MenuScene.SceneID UnknownCat = new(nameof(UnknownCat) + tail, false);
         
     }
 
     internal static MenuScene.SceneID GetSelectScreenSceneID(this SlugcatStats.Name name)
     {
         if (name == SlugcatStats.Name.Yellow) return EscapismEndingSlugcatScreen.Monk;
-        if (name == SlugcatStats.Name.White) return EscapismEndingSlugcatScreen.Survivor;
         if (name == SlugcatStats.Name.Red) return EscapismEndingSlugcatScreen.Hunter;
         if (name == SlugcatStatsName.Spear) return EscapismEndingSlugcatScreen.Spearmaster;
         if (name == SlugcatStatsName.Artificer) return EscapismEndingSlugcatScreen.Artificer;
         if (name == SlugcatStatsName.Gourmand) return EscapismEndingSlugcatScreen.Gourmand;
         if (name == SlugcatStatsName.Rivulet) return EscapismEndingSlugcatScreen.Rivulet;
-        if (name == SlugcatStatsName.Saint) return EscapismEndingSlugcatScreen.Saint;
-        if (name == SlugcatStatsName.Sofanthiel) return EscapismEndingSlugcatScreen.Sofanthiel;
-        return EscapismEndingSlugcatScreen.UnknownCat;
+        return EscapismEndingSlugcatScreen.Survivor;
     }
     
 
