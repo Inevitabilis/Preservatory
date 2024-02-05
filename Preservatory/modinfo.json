@@ -1,0 +1,12 @@
+{
+	"id": "preservatory",
+	"name": "Preservatory",
+	"version": "1.0.00",
+	"hide_version": true,
+	"authors": "Fishnoid",
+      "description": "A new path awaits at the garden's peak, offering secrets and unforseen dangers."
+	"requirements": ["regionkit","hanging.gardens","lb-fgf-m4r-ik.howling-rift","moreslugcats"],
+	"requirements_names": ["RegionKit","Hanging Gardens","Howling Rift Code Stuff","More Slugcats Expansion"],
+	"tags": ["Regions"],
+	"checksum_override_version": false
+}

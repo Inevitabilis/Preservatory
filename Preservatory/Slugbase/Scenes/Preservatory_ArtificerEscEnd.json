@@ -1,0 +1,10 @@
+{
+  "id": "Preservatory_ArtificerEscEnd",
+  "scene_folder": "Scenes/Stasis_Artificer",
+  "images": [
+    {"name": "Stasis_Artificer_Flat", "pos": [  0,   0], "depth": -1.0, "flatmode": true}, 
+    {"name": "Stasis_Artificer_2",    "pos": [433, 134], "depth": 2.0, "shader": "Normal"},
+    {"name": "Stasis_Artificer_1",    "pos": [433, 134], "depth": 3.0, "shader": "Normal"},
+  ],
+  "idle_depths": [2.0],
+}

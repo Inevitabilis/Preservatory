@@ -1,0 +1,6 @@
+Template: NONE
+Grime: 0.2173913
+Palette: 213
+EffectColorA: 8
+PlacedObjects: None><0><0><, None><0><0><, PlacedWaterfall><627.2><619.9995><-35~-119~0.08696183~1, LightSource><458.7095><632.1959><0.5434783~Environment~101~-112~-441~-51.39746~1~0~None~0~0, LightSource><560.1079><77.1684><0.6195652~Environment~103~100~-23~-89.39746~1~0~None~0~0, LightSource><81.53204><265.6974><0.5108696~Environment~126~34~50~86.60254~1~0~None~0~0, LightSource><853.1731><143.0654><0.2717391~Environment~-208~-15~2~237.6025~1~0~None~0~0, 
+FadePalette: 10, 0

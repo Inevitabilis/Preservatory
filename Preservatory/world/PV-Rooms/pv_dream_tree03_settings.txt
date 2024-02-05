@@ -1,0 +1,12 @@
+Template: NONE
+DangerType: None
+Clouds: 0.5
+Grime: 0.1521739
+BkgDroneVolume: 0
+Palette: 53
+EffectColorA: 10
+EffectColorB: 2
+Effects: LightBurn-0.3586957-20-20, WaterGlowworm-0.423913-30-94, MossWater-0-285-20, SilenceWater-0.1956522-294-75, 
+PlacedObjects: LightSource><580.6548><118.6267><0.6195652~EffectColor1~-368~68~255~-94.39746~0~0~None~0~0, LightSource><746><126><0.5978261~EffectColor1~-342~277~115~190.6025~0~0~None~0~0, LightBeam><347.3013><171.9775><-165~212~53~262~403~3~-539~164~0.5739131~0.2282609~0~0~None~0~0, LightSource><336.4202><368.0667><0.2282609~Environment~259~-106~-312~87.60254~0~1~None~0~0, LightSource><805.5834><364.8607><0.6521739~Environment~-253~127~50~86.60254~0~0~None~0~0, LightSource><653.9055><361.0737><0.1086956~Environment~-469~68~-336~198.6025~0~1~None~0~0, 
+AmbientSounds: OMNI><AM_ENV-Outside.ogg><41.62579><524.3433><0.3913043><1, OMNI><SO_WAT-LilDrips.ogg><33.55042><445.2369><0.5><1, SPOT><AM_ENV-WindGrass.ogg><234.9347><487.9232><0.3586957><1><380.9347><331.9232><-63.35535><-72.35535><0><0.1434784, 
+FadePalette: 20, 0.3043478

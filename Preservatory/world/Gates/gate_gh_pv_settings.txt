@@ -1,0 +1,13 @@
+Template: NONE
+RainIntensity: 0
+RumbleIntensity: 0.01086957
+WaveSpeed: 0.5000157
+WaveLength: 0.9999921
+WaveAmplitude: 1.744769E-07
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Grime: 0.2065217
+Palette: 212
+PlacedObjects: CustomDecal><43.83554><-8.1362><62~560~812~564~832~-16~-195~132~0~0.5978261~1~rustb2~0.3152174~1~0.3152174~1~0.3152174~1~0.3152174~1, NoSpearStickZone><477.6435><235.5808><198~97, ElectricGateData><483.4342><-43.17188><333~197~True~False~False~True~True~True~True~False~0.3913046~1~True~0.3913053~1~1, 
+AmbientSounds: OMNI><AM_ENV-CityTone.ogg><38.27661><527.0518><0.2391304><1, OMNI><AM_ENV-LightWind.ogg><35.41254><379.8201><0.2717391><1, OMNI><SO_WAT-LilDrips.ogg><37.10059><304.6171><0.4021739><1, 
+FadePalette: 213, 0.6086956

@@ -1,0 +1,15 @@
+TH_PV - drips : NEUTRAL
+TH_PV - hinge : NEUTRAL
+TH_PV - kick : NEUTRAL
+TH_PV - pulse : NEUTRAL
+TH_PV - riser : NEUTRAL
+TH_PV - shaker : NEUTRAL
+TH_PV - twang : NEUTRAL
+TH_PV - chime : NEUTRAL
+
+Layer : TH_PV - kick, TH_PV - drips, TH_PV - pulse
+Layer : TH_PV - kick, TH_PV - drips, TH_PV - pulse, TH_PV - riser
+Layer : TH_PV - kick, TH_PV - drips, TH_PV - pulse, TH_PV - riser, TH_PV - hinge, TH_PV - chime
+Layer : TH_PV - kick, TH_PV - drips, TH_PV - pulse, TH_PV - riser, TH_PV - hinge, TH_PV - shaker
+Layer : TH_PV - kick, TH_PV - twang, TH_PV - riser, TH_PV - hinge, TH_PV - shaker, TH_PV - chime
+Layer : TH_PV - twang, TH_PV - riser, TH_PV - hinge, TH_PV - shaker, TH_PV - chime

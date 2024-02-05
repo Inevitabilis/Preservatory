@@ -1,0 +1,10 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0.2065217
+RandomItemDensity: 0
+Palette: 213
+Effects: WaterDepth-1-20-20, SilenceWater-1-27-93, NonlethalWater-1-260-21, 
+PlacedObjects: CustomDecal><111.3038><-24.03888><3~739~737~741~739~-2~-284~202~0.6413044~0.6956522~0~pv_demoend~1~0~1~0~1~0~1~0, LightSource><479.4835><343.9493><1~White~860~-232~50~86.60254~0~0~None~0~0, CustomDecal><112.0001><-22.99998><3~739~737~741~739~-2~-284~202~0.6304348~0.7173913~0~pv_demoend~1~0~1~0~1~0~1~0, 
+AmbientSounds: OMNI><waterGurgleLOOP3.wav><89.35913><522.6676><0.3043478><0.2956522, SPOT><SO_SFX-DataTrans2.ogg><737.1716><412.8528><0.2065217><1><826.1717><249.8528><-20.35535><-61.35535><0><0.502174, OMNI><SO_SFX-Heartbeat1.ogg><87.11926><431.0986><0.5><0.3347826, 
+FadePalette: 31, 0.6086956

@@ -1,0 +1,15 @@
+Template: NONE
+DangerType: None
+WaveSpeed: 0.5055074
+WaveLength: 0.9972463
+WaveAmplitude: 0.03908417
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.8043478
+Palette: 213
+EffectColorA: 8
+EffectColorB: 9
+Effects: SilenceWater-1-21-68, SuperStructureProjector-0.5-288-21, SunBlock-1-284-76, ReplaceEffectColorB-0-469-508-Color-0.3804348-0.4347826-0.2391304, FairyParticles-0.1521739-31-123, ReplaceEffectColorA-0-745-508-Color-0.1304348-0.4130435-0.1195652, NonlethalWater-1-20-20, 
+PlacedObjects: CGDrySpot><-202.4475><-52.96851><100~50~578^427~True~None, FreeformDecalOrSprite><337.199><-53.26965><-283~125~0;0^560;-1^560;93^0;93~PV_A10_Cover~1~Basic~Water~255~False~FFFFFF, FreeformDecalOrSprite><347.9091><511.8712><-741~-499~0;0^44;3^41;156^2;154~Futile_White~1~DeepWater~Foreground~255~False~FFFFFF, FreeformDecalOrSprite><509.4283><506.9367><-908~-32~0;0^45;2^43;159^1;162~Futile_White~1~DeepWater~Foreground~255~False~FFFFFF, FreeformDecalOrSprite><430.4521><512.5558><-851~-289~0;0^43;-3^43;156^-1;153~Futile_White~1~DeepWater~Foreground~255~False~FFFFFF, FreeformDecalOrSprite><592.3627><503.8954><269.0001~11~0;0^43;1^41;168^-1;166~Futile_White~1~DeepWater~Foreground~255~False~FFFFFF, CGDrySpot><868.1207><-53.65953><100~50~296^423~True~None, LightSource><775.45><512.5027><0.4456522~EffectColor1~360~-119~81~-120.3975~0~0~None~0~0, LightSource><33.18066><208.5858><0.3695652~EffectColor1~421~-10~50~86.60254~0~0~None~0~0, LightSource><241.2226><213.6981><0.423913~Environment~-143~126~-174~237.6025~0~0~None~0~0, LightSource><164.8932><627.3896><0.5760869~EffectColor2~-208~-236~-207~-477.3975~0~0~None~0~0, LightSource><601.6125><250.4154><0.4565217~EffectColor2~-404~72~82~-47.39746~0~0~None~0~0, FairyParticleSettings><127.0723><116.6581><248~-430.3398~0~1~1~0~1~1.448696~60~495.2173~18.26079~89.13056~5~30~0~360~0.3695652~0.5326087~0.1521739~0.2282609~0.05434782~0.423913~1~0.1195652~7.790894~Pixel~SIN_IO~SIN_IO~0~0~0, CustomDecal><19.56049><224.3137><-27~362~795~345~830~18~845~-172~0.6086956~0.6413044~0~roundwhite~0.2065217~0~0.2065217~0~0.2065217~0~0.2065217~0, LightSource><437.5255><328.9484><0.05434782~EffectColor2~695~-276~128~42.60254~0~1~None~0~0, LightSource><490.0001><651><0.5869565~EffectColor2~-216~-255~-207~-477.3975~0~0~None~0~0, LightSource><280.0001><402><0.1304348~White~439~-67~50~86.60254~0~0~None~0~0, 
+AmbientSounds: OMNI><so_sfx-drowning.ogg><74.19995><526.9436><0.4021739><1, SPOT><AM_IND-ElectricHum01.ogg><52.05652><403.3082><0.1956522><1><215.0565><254.3082><-67.35535><-43.35535><0><0.1, SPOT><AM_IND-ElectricHum01.ogg><56.67688><274.1566><0.2608696><1><547.6769><475.1567><-102.3553><-51.35535><0><0.1434782, OMNI><SO_SFX-DataTrans2.ogg><47.60217><189.6719><0.3043478><1, SPOT><AM_IND-DeepHum.ogg><269.1938><482.9509><0.5><1><158.1938><21.95088><-162.3553><-81.35534><0><0.1, SPOT><waterGurgleLOOP3.wav><253.1691><353.0671><0.4456522><0.3347826><616.1691><160.0672><-203.3553><-80.35535><0><0.05652187, SPOT><waterGurgleLOOP3.wav><725.622><340.1537><0.326087><0.3152174><508.622><617.1537><-136.3553><-61.35535><0><0.1, 
+FadePalette: 31, 0.4021739

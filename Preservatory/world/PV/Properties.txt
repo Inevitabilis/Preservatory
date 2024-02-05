@@ -1,0 +1,31 @@
+Palette: 213
+waterColorOverride: 0.28, 0.49, 0.38
+kelpColor: 0.32,0.38,0.36
+corruptionEffectColor: 0.45,0.02,0.01
+corruptionEyeColor: 0.45,0.02,0.01
+batDepleteCyclesMin: 2
+batDepleteCyclesMax: 7
+batDepleteCyclesMaxIfLessThanTwoLeft: 3
+batDepleteCyclesMaxIfLessThanFiveLeft: 4
+overseersSpawnChance: 0.0
+overseersMin: 0
+overseersMax: 3
+playerGuideOverseerSpawnChance: 0.0
+Subregion: Preservatory
+Subregion: Forgone Cycles
+Room_Attr: PV_C02: GreenLizard-Forbidden,PinkLizard-Forbidden,BlueLizard-Forbidden,WhiteLizard-Forbidden,
+Room_Attr: PV_C04: BlueLizard-Avoid,WhiteLizard-Forbidden,
+Room_Attr: PV_A04: GreenLizard-Forbidden,PinkLizard-Forbidden,BlueLizard-Forbidden,WhiteLizard-Forbidden,
+Room_Attr: PV_D02: WhiteLizard-Forbidden,
+Room_Attr: PV_C06: PinkLizard-Forbidden,WhiteLizard-Forbidden,RedLizard-Forbidden,
+Room_Attr: PV_A06: WhiteLizard-Like,
+Room_Attr: PV_B04: RedLizard-Avoid,
+Room_Attr: PV_B05: RedLizard-Like,
+Room_Attr: PV_A08: WhiteLizard-Forbidden,BlueLizard-Avoid,
+Room_Attr: PV_G01: BlueLizard-Avoid,
+Room_Attr: PV_D03: Inspector-Forbidden,
+Room_Attr: PV_D04: Inspector-Stay,
+Room_Attr: PV_B06: Inspector-Forbidden,
+Room_Attr: PV_B07: Inspector-Forbidden,
+Room_Attr: PV_C07: GreenLizard-Forbidden,PinkLizard-Forbidden,BlueLizard-Forbidden,WhiteLizard-Forbidden,
+Room_Attr: PV_C08: Inspector-Forbidden,
