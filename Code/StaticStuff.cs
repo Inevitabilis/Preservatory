@@ -10,6 +10,7 @@ namespace PVStuffMod;
 
 public static class StaticStuff
 {
+    public const int TicksPerSecond = 40;
     public const bool devBuild = true;
     public const string head = "Preservatory_";
     public const string tail = "EscEnd";
