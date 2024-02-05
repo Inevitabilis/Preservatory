@@ -91,10 +91,12 @@ public class DreamEnder : UpdatableAndDeletable, IDrawable
     {
     }
     #endregion
+    #region methods
 
     AbstractRoom GetOutOfDreamSequenceRoom(SlugcatStats.Name name)
     {
         return room.world.GetAbstractRoom((name == SlugcatStats.Name.Red) ? "RED_END" : "END");
     }
+    #endregion
 
 }
