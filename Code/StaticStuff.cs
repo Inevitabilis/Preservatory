@@ -16,17 +16,45 @@ public static class StaticStuff
     public const string tail = "EscEnd";
     internal const string stasisRoomName = "SWIM";
     internal static HashSet<SlugcatStats.Name> EscapismEnding = new();
-    public class EscapismEndingSlugcatScreen : ExtEnum<EscapismEndingSlugcatScreen>
+    public static void LoadEnums()
     {
-        public EscapismEndingSlugcatScreen(string value, bool register = false) : base(value, register) { }
-        public static MenuScene.SceneID Artificer = new(head + nameof(Artificer) + tail, false);
-        public static MenuScene.SceneID Gourmand = new(head +nameof(Gourmand) + tail, false);
-        public static MenuScene.SceneID Spearmaster = new(head + nameof(Spearmaster) + tail, false);
-        public static MenuScene.SceneID Survivor = new(head + nameof(Survivor) + tail, false);
-        public static MenuScene.SceneID Monk = new(head + nameof(Monk) + tail, false);
-        public static MenuScene.SceneID Rivulet = new(head + nameof(Rivulet) + tail, false);
-        public static MenuScene.SceneID Hunter = new(head + nameof(Hunter) + tail, false);
+        Melody.LoadMusicEnums();
+        EscapismEndingSlugcatScreen.LoadSlugcatSceneEnums();
+    }
+    public class EscapismEndingSlugcatScreen
+    {
+        public static void LoadSlugcatSceneEnums()
+        {
+            Artificer = new(head + nameof(Artificer) + tail);
+            Gourmand = new(head + nameof(Gourmand) + tail);
+            Spearmaster = new(head + nameof(Spearmaster) + tail);
+            Survivor = new(head + nameof(Survivor) + tail);
+            Monk = new(head + nameof(Monk) + tail);
+            Rivulet = new(head + nameof(Rivulet) + tail);
+            Hunter = new(head + nameof(Hunter) + tail);
+        }
 
+        public static MenuScene.SceneID? Artificer;
+        public static MenuScene.SceneID? Gourmand;
+        public static MenuScene.SceneID? Spearmaster;
+        public static MenuScene.SceneID? Survivor;
+        public static MenuScene.SceneID? Monk;
+        public static MenuScene.SceneID? Rivulet;
+        public static MenuScene.SceneID? Hunter;
+    }
+    public static class Melody
+    {
+        public static void LoadMusicEnums()
+        {
+            approach0 = new(head + nameof(approach0), true);
+            approach1 = new(head + nameof(approach1), true);
+            approach2 = new(head + nameof(approach2), true);
+            approach3 = new(head + nameof(approach3), true);
+        }
+        public static SoundID? approach0;
+        public static SoundID? approach1;
+        public static SoundID? approach2;
+        public static SoundID? approach3;
     }
     internal static Dictionary<MenuScene.SceneID, SlugcatStats.Name> sceneNameMap = new()
     {
@@ -47,6 +75,8 @@ public static class StaticStuff
         { Slugcat_Artificer_Robo2, Artificer },
         { AltEnd_Artificer_Portrait, Artificer },
         { End_Artificer, Artificer },
+        { Slugcat_Rivulet, Rivulet },
+        { Slugcat_Rivulet_Cell, Rivulet },
         { End_Rivulet, Rivulet },
         { AltEnd_Rivulet, Rivulet },
         { AltEnd_Rivulet_Robe, Rivulet },
@@ -57,12 +87,15 @@ public static class StaticStuff
     };
     internal static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap = new()
     {
+#pragma warning disable CS8604 // Possible null reference argument.
         { Yellow, EscapismEndingSlugcatScreen.Monk },
         { Red, EscapismEndingSlugcatScreen.Hunter },
         { Gourmand, EscapismEndingSlugcatScreen.Gourmand },
         { MoreSlugcatsEnums.SlugcatStatsName.Spear, EscapismEndingSlugcatScreen.Spearmaster },
         { Artificer, EscapismEndingSlugcatScreen.Artificer },
-        { Rivulet, EscapismEndingSlugcatScreen.Rivulet }
+        { Rivulet, EscapismEndingSlugcatScreen.Rivulet },
+        { White, EscapismEndingSlugcatScreen.Survivor }
+#pragma warning restore CS8604 // Possible null reference argument.
     };
 
     static internal SlugcatStats.Name GetCharacterFromSelectScene(this MenuScene.SceneID sceneID)
@@ -71,6 +104,12 @@ public static class StaticStuff
     }
     static internal MenuScene.SceneID GetSelectScreenSceneID(this SlugcatStats.Name character)
     {
+#pragma warning disable CS8603 // Possible null reference return.
         return nameSceneMap.TryGetValue(character, out var sceneID) ? sceneID : EscapismEndingSlugcatScreen.Survivor;
+#pragma warning restore CS8603 // Possible null reference return.
     }
+}
+public interface IReceiveWorldTicks
+{
+    public void Update();
 }

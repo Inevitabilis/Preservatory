@@ -1,35 +1,46 @@
 ﻿using UnityEngine;
 using Menu;
 using static PVStuffMod.StaticStuff;
+using System;
+using System.Collections.Generic;
+using System.CodeDom;
+using PVStuff.Logic.ROM_objects;
+using ROM.RoomObjectService;
+using System.IO;
 
 namespace PVStuffMod;
 
 internal static class MainLogic
 {
+    public static List<IReceiveWorldTicks> globalUpdateReceivers;
 
+    static MainLogic()
+    {
+        globalUpdateReceivers = [new InternalSoundController(), new ScreenFlasher()];
+    }
     static internal void Startup()
     {
-        PlayerLogic.ApplyHooks();
+        //PlayerLogic.ApplyHooks();
+        //Scene related changes
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
-
-    }
-    static internal void RegisterROMObjects()
-    {
-
-    }
-
-    static internal void HackySolutions()
-    {
-        On.Menu.SlugcatSelectMenu.Update += static (On.Menu.SlugcatSelectMenu.orig_Update orig, Menu.SlugcatSelectMenu self) =>
+        //for things that do not receive local updates
+        On.RainWorldGame.Update += static (orig, self) =>
         {
             orig(self);
-            if (Input.GetKeyUp("g"))
-            {
-                SlugcatStats.Name currentlySelectedSinglePlayerSlugcat = self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat;
-                SaveState saveState = self.manager.rainWorld.progression.GetOrInitiateSaveState(currentlySelectedSinglePlayerSlugcat, null, self.manager.menuSetup, false);
-
-            }
+            globalUpdateReceivers.ForEach(x => x.Update());
         };
+        StaticStuff.LoadEnums();
+        RegisterROMObjects();
+    }
+
+    private static bool SoundLoader_CheckIfFileExistsAsExternal(On.SoundLoader.orig_CheckIfFileExistsAsExternal orig, SoundLoader self, string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    static internal void RegisterROMObjects()
+    {
+        TypeOperator.RegisterType<ExposedSoundControllerOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {

@@ -50,12 +50,12 @@ sealed class PVStuff : BaseUnityPlugin
 
     public void OnEnable()
     {
-        MainLogic.Startup();
 
         s_logger = Logger;
         On.RainWorld.OnModsInit += static (orig, self) =>
         {
             orig(self);
+            MainLogic.Startup();
             if (!Futile.atlasManager.DoesContainAtlas("pvstuffspr"))
                 Futile.atlasManager.LoadAtlas("atlases/pvstuffspr");
         };
