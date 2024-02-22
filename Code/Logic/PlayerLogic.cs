@@ -16,6 +16,7 @@ internal class PlayerLogic
     private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
     {
         orig(self, eu);
+        if (self?.room?.world?.name == null) return;
         if (!(self.room.world.name == "PV")) return;
         DeepDiveLogic(self);
     }
