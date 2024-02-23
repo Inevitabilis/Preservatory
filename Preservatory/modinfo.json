@@ -8,5 +8,5 @@
 	"requirements": ["regionkit","hanging.gardens","lb-fgf-m4r-ik.howling-rift","moreslugcats", "slime-cubed.slugbase"],
 	"requirements_names": ["RegionKit","Hanging Gardens","Howling Rift Code Stuff","More Slugcats Expansion", "Slugbase"],
 	"tags": ["Regions"],
-	"checksum_override_version": true
+	"checksum_override_version": false
 }
