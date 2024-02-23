@@ -4,7 +4,7 @@ using static PVStuffMod.StaticStuff;
 using System;
 using System.Collections.Generic;
 using System.CodeDom;
-using PVStuff.Logic.ROM_objects;
+using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
 using System.IO;
 
@@ -16,7 +16,7 @@ internal static class MainLogic
 
     static MainLogic()
     {
-        globalUpdateReceivers = [new InternalSoundController(), new ScreenFlasher()];
+        globalUpdateReceivers = [new InternalSoundController(), new Logic.ScreenFlasher()];
     }
     static internal void Startup()
     {
@@ -32,19 +32,13 @@ internal static class MainLogic
         StaticStuff.LoadEnums();
         RegisterROMObjects();
     }
-
-    private static bool SoundLoader_CheckIfFileExistsAsExternal(On.SoundLoader.orig_CheckIfFileExistsAsExternal orig, SoundLoader self, string name)
-    {
-        throw new NotImplementedException();
-    }
-
     static internal void RegisterROMObjects()
     {
         TypeOperator.RegisterType<ExposedSoundControllerOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
-        if(self.menu is SlugcatSelectMenu && (devBuild || EscapismEnding.Contains(self.sceneID.GetCharacterFromSelectScene())))
+        if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || EscapismEnding.Contains(self.sceneID.GetCharacterFromSelectScene())))
             self.sceneID = self.sceneID.GetCharacterFromSelectScene().GetSelectScreenSceneID();
         orig(self);
     }

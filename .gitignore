@@ -134,3 +134,5 @@ _NCrunch*
 
 *.v2
 *.vsidx
+*.v7.bin
+DocumentLayout.json

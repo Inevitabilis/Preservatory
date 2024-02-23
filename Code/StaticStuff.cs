@@ -5,6 +5,7 @@ using static SlugcatStats.Name;
 using static MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using static MoreSlugcats.MoreSlugcatsEnums.MenuSceneID;
 using static Menu.MenuScene.SceneID;
+using UnityEngine;
 
 namespace PVStuffMod;
 
@@ -21,7 +22,7 @@ public static class StaticStuff
         Melody.LoadMusicEnums();
         EscapismEndingSlugcatScreen.LoadSlugcatSceneEnums();
     }
-    public class EscapismEndingSlugcatScreen
+    public static class EscapismEndingSlugcatScreen
     {
         public static void LoadSlugcatSceneEnums()
         {
@@ -107,6 +108,30 @@ public static class StaticStuff
 #pragma warning disable CS8603 // Possible null reference return.
         return nameSceneMap.TryGetValue(character, out var sceneID) ? sceneID : EscapismEndingSlugcatScreen.Survivor;
 #pragma warning restore CS8603 // Possible null reference return.
+    }
+}
+public static class ROMUtils
+{
+    private enum EquationPosition
+    {
+        above,
+        below
+    }
+    public static bool PositionWithinPoly(Vector2[] Polygon, Vector2 point)
+    {
+        for (int i = 0; i < Polygon.Length; i++)
+        {
+            Vector2 currentline = Polygon[(i + 1) % Polygon.Length] - Polygon[i];
+            Vector2 nextdirline = Polygon[(i + 2) % Polygon.Length] - Polygon[i];
+            EquationPosition whereToCheck = nextdirline.GetAngle() - currentline.GetAngle() > 0 ? EquationPosition.below : EquationPosition.above;
+            if (!InAreaForTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point, whereToCheck)) return false;
+        }
+        return true;
+    }
+    private static bool InAreaForTwoPoints(Vector2 point1, Vector2 point2, Vector2 v, EquationPosition equationPosition)
+    {
+        if (equationPosition == EquationPosition.above) return (v.x - point1.x) / (point2.x - point1.x) <= (v.y - point1.y) / (point2.y - point1.y);
+        else return (v.x - point1.x) * (point2.y - point1.y) > (v.y - point1.y) * (point2.x - point1.x);
     }
 }
 public interface IReceiveWorldTicks

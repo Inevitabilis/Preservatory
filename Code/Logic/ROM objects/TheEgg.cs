@@ -8,7 +8,7 @@ using RWCustom;
 
 namespace PVStuffMod.Logic;
 
-internal class TheEgg : BackgroundScene.BackgroundSceneElement, IDrawable
+internal class TheEgg : BackgroundScene.BackgroundSceneElement
 {
     internal float whiteFade;
     internal float lastWhiteFade;

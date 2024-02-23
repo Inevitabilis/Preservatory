@@ -1,22 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PVStuffMod;
+﻿using Newtonsoft.Json.Linq;
 using ROM.RoomObjectService;
 using ROM.UserInteraction.InroomManagement;
 using ROM.UserInteraction.ObjectEditorElement;
-using ROM.UserInteraction.ObjectEditorElement.LevelPosition;
 using ROM.UserInteraction.ObjectEditorElement.Scrollbar;
-using ROM.UserInteraction.ObjectEditorElement.TextField;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using static PVStuffMod.StaticStuff;
-using static RWCustom.Custom;
 
-namespace PVStuff.Logic.ROM_objects;
+namespace PVStuffMod.Logic.ROM_objects;
 /// <summary>
 /// ROM can only work with room specific objects as of now, so to prevent it from disappearing the exposed objects are different
 /// </summary>
@@ -116,11 +109,6 @@ public class ExposedSoundController : UpdatableAndDeletable
     private int lingerTimer;
     #endregion
 
-    private enum EquationPosition
-    {
-        above,
-        below
-    }
     #region methods
     public override void Update(bool eu)
     {
@@ -131,7 +119,7 @@ public class ExposedSoundController : UpdatableAndDeletable
         if (soundController == null) return;
         if (lingerTimer > 0) lingerTimer--;
         else if (soundController.controllerReference == this) soundController.controllerReference = null;
-        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom && PositionWithinPoly(abstractCreature.realizedCreature.mainBodyChunk.pos)))
+        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
         {
             soundController.controllerReference = this;
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
@@ -144,22 +132,7 @@ public class ExposedSoundController : UpdatableAndDeletable
             if (x is InternalSoundController controller && controller.room == null) controller.room = this.room;
         });
     }
-    private bool PositionWithinPoly(Vector2 point)
-    {
-        for (int i = 0; i < Polygon.Length; i++)
-        {
-            Vector2 currentline = Polygon[(i + 1) % Polygon.Length] - Polygon[i];
-            Vector2 nextdirline = Polygon[(i + 2) % Polygon.Length] - Polygon[i];
-            EquationPosition whereToCheck = nextdirline.GetAngle() - currentline.GetAngle() > 0 ? EquationPosition.below : EquationPosition.above;
-            if (!InAreaForTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point, whereToCheck)) return false;
-        }
-        return true;
-    }
-    private bool InAreaForTwoPoints(Vector2 point1, Vector2 point2, Vector2 v, EquationPosition equationPosition)
-    {
-        if (equationPosition == EquationPosition.above) return (v.x - point1.x) / (point2.x - point1.x) <= (v.y - point1.y) / (point2.y - point1.y);
-        else return (v.x - point1.x) * (point2.y - point1.y) > (v.y - point1.y) * (point2.x - point1.x);
-    }
+
 
     #endregion
 }
