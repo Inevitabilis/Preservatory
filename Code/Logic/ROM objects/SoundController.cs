@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using static PVStuffMod.StaticStuff;
+using static PVStuffMod.MainLogic;
 
 namespace PVStuffMod.Logic.ROM_objects;
 /// <summary>
@@ -113,24 +114,20 @@ public class ExposedSoundController : UpdatableAndDeletable
     public override void Update(bool eu)
     {
         base.Update(eu);
+
         UpdateSoundController();
 
-        InternalSoundController? soundController = MainLogic.globalUpdateReceivers.Find(x => x is InternalSoundController) as InternalSoundController;
-        if (soundController == null) return;
         if (lingerTimer > 0) lingerTimer--;
-        else if (soundController.controllerReference == this) soundController.controllerReference = null;
+        else if (internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
         if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
         {
-            soundController.controllerReference = this;
+            internalSoundController.controllerReference = this;
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
         }
     }
     private void UpdateSoundController()
     {
-        MainLogic.globalUpdateReceivers.ForEach(x =>
-        {
-            if (x is InternalSoundController controller && controller.room == null) controller.room = this.room;
-        });
+        internalSoundController.room ??= this.room;
     }
 
 

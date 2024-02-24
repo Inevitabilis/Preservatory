@@ -7,16 +7,20 @@ using System.CodeDom;
 using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
 using System.IO;
+using PVStuffMod.Logic;
 
 namespace PVStuffMod;
 
 internal static class MainLogic
 {
-    public static List<IReceiveWorldTicks> globalUpdateReceivers;
-
+    public static IReceiveWorldTicks[] globalUpdateReceivers;
+    public static InternalSoundController internalSoundController;
+    public static ScreenFlasher screenFlasher;
     static MainLogic()
     {
-        globalUpdateReceivers = [new InternalSoundController(), new Logic.ScreenFlasher()];
+        internalSoundController = new();
+        screenFlasher = new();
+        globalUpdateReceivers = [internalSoundController, screenFlasher];
     }
     static internal void Startup()
     {
@@ -27,7 +31,7 @@ internal static class MainLogic
         On.RainWorldGame.Update += static (orig, self) =>
         {
             orig(self);
-            globalUpdateReceivers.ForEach(x => x.Update());
+            Array.ForEach(globalUpdateReceivers,x => x.Update());
         };
         StaticStuff.LoadEnums();
         RegisterROMObjects();
