@@ -18,7 +18,9 @@ public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
 {
     DisembodiedLoopEmitter[]? disembodiedLoopEmitters;
     public ExposedSoundController? controllerReference;
-    
+    public bool SlatedForDeletion => false;
+
+
     public void Update()
     {
         if (room == null) return;
@@ -44,10 +46,10 @@ public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
         {
             disembodiedLoopEmitters =
             [
-                CreateNewSoundLoop(Melody.approach0, 0, 1, 1),
-                CreateNewSoundLoop(Melody.approach1, 0, 1, 1),
-                CreateNewSoundLoop(Melody.approach2, 0, 1, 1),
-                CreateNewSoundLoop(Melody.approach3, 0, 1, 1),
+                CreateNewSoundLoop(PVEnums.Melody.approach0, 0, 1, 1),
+                CreateNewSoundLoop(PVEnums.Melody.approach1, 0, 1, 1),
+                CreateNewSoundLoop(PVEnums.Melody.approach2, 0, 1, 1),
+                CreateNewSoundLoop(PVEnums.Melody.approach3, 0, 1, 1),
             ];
             Array.ForEach(disembodiedLoopEmitters, x => x.requireActiveUpkeep = false);
         }
@@ -119,7 +121,9 @@ public class ExposedSoundController : UpdatableAndDeletable
 
         if (lingerTimer > 0) lingerTimer--;
         else if (internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
-        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
+        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom 
+        && abstractCreature.realizedCreature != null 
+        && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
         {
             internalSoundController.controllerReference = this;
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);

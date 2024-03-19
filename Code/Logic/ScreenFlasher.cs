@@ -7,11 +7,16 @@ namespace PVStuffMod.Logic;
 /// because it's been happening in multiple places, there was a decision to make it a separate thing
 /// it's event driven, the hash that is being passed in to request it to start working is used to know which object should act on given event
 /// </summary>
-internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
+public class ScreenFlasher : IDrawable, IReceiveWorldTicks
 {
     int SummonerHash, ticksToFadeIn, ticksToFadeOut, idlingTicks, colorLerpingTicks;
     Color color, previousColor, colorToLerpTo;
-    State state;
+    State state = State.Idle;
+    public bool SlatedForDeletion
+    {
+        get; private set;
+    }
+    
 
     int timer, colorTimer;
     int PreviousTick
@@ -57,7 +62,8 @@ internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
         }
     }
 
-    public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill;
+
+    public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill, TickOnCompletion;
     enum State
     {
         Idle,
@@ -102,7 +108,9 @@ internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
                     if (timer >= ticksToFadeOut)
                     {
                         timer = 0;
+                        SlatedForDeletion = true;
                         state = State.Idle;
+                        TickOnCompletion?.Invoke(SummonerHash);
                     }
                     break;
                 }
@@ -121,7 +129,11 @@ internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
 
 
     }
-    public void RequestScreenFlash(int ownerHash, int ticksToFadeIn, int idleTicks, int ticksToFadeOut, Color color)
+    public void RequestScreenFlash(int ownerHash,
+        Color color,
+        int ticksToFadeIn = StaticStuff.TicksPerSecond * 1,
+        int idleTicks = StaticStuff.TicksPerSecond * 3,
+        int ticksToFadeOut = StaticStuff.TicksPerSecond * 1)
     {
         SummonerHash = ownerHash;
         this.ticksToFadeIn = ticksToFadeIn;
@@ -145,13 +157,15 @@ internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
             alpha = 0f,
             shader = rCam.game.rainWorld.Shaders["FlatLightNoisy"]
         };
-        AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Foreground"));
+        AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Bloom"));
     }
 
     public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        sLeaser.sprites[0].scale = Mathf.Lerp(150f, 300f, Mathf.Pow(FlareStrength, 4f));
-        sLeaser.sprites[0].alpha = 0.25f * Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
+        sLeaser.sprites[0].scale = Mathf.Lerp(150f, 1000f, Mathf.Pow(FlareStrength, 4f));
+        sLeaser.sprites[0].alpha = Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
+        sLeaser.sprites[0].x = camPos.x;
+        sLeaser.sprites[0].y = camPos.y;
     }
 
     public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
@@ -166,6 +180,6 @@ internal class ScreenFlasher : IDrawable, IReceiveWorldTicks
 
     public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera camera, RoomPalette palette)
     {
-    }
+    } 
     #endregion
 }

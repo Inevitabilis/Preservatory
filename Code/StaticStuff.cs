@@ -6,46 +6,39 @@ using static MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using static MoreSlugcats.MoreSlugcatsEnums.MenuSceneID;
 using static Menu.MenuScene.SceneID;
 using UnityEngine;
+using System.Runtime.InteropServices;
+using PVStuffMod.Logic;
+using IL.RWCustom;
+using Newtonsoft.Json.Serialization;
 
 namespace PVStuffMod;
 
-public static class StaticStuff
+public static class PVEnums
 {
-    public const int TicksPerSecond = 40;
-    public const bool devBuild = true;
-    public const string head = "Preservatory_";
-    public const string tail = "EscEnd";
-    internal const string stasisRoomName = "SWIM";
-    internal static HashSet<SlugcatStats.Name> EscapismEnding = new();
-    public static void LoadEnums()
+    const string head = "Preservatory_";
+    const string tail = "EscEnd";
+    static PVEnums()
     {
-        Melody.LoadMusicEnums();
-        EscapismEndingSlugcatScreen.LoadSlugcatSceneEnums();
+        Artificer = new(head + nameof(Artificer) + tail);
+        Gourmand = new(head + nameof(Gourmand) + tail);
+        Spearmaster = new(head + nameof(Spearmaster) + tail);
+        Survivor = new(head + nameof(Survivor) + tail);
+        Monk = new(head + nameof(Monk) + tail);
+        Rivulet = new(head + nameof(Rivulet) + tail);
+        Hunter = new(head + nameof(Hunter) + tail);
     }
-    public static class EscapismEndingSlugcatScreen
-    {
-        public static void LoadSlugcatSceneEnums()
-        {
-            Artificer = new(head + nameof(Artificer) + tail);
-            Gourmand = new(head + nameof(Gourmand) + tail);
-            Spearmaster = new(head + nameof(Spearmaster) + tail);
-            Survivor = new(head + nameof(Survivor) + tail);
-            Monk = new(head + nameof(Monk) + tail);
-            Rivulet = new(head + nameof(Rivulet) + tail);
-            Hunter = new(head + nameof(Hunter) + tail);
-        }
+    public static MenuScene.SceneID Artificer;
+    public static MenuScene.SceneID Gourmand;
+    public static MenuScene.SceneID Spearmaster;
+    public static MenuScene.SceneID Survivor;
+    public static MenuScene.SceneID Monk;
+    public static MenuScene.SceneID Rivulet;
+    public static MenuScene.SceneID Hunter;
 
-        public static MenuScene.SceneID? Artificer;
-        public static MenuScene.SceneID? Gourmand;
-        public static MenuScene.SceneID? Spearmaster;
-        public static MenuScene.SceneID? Survivor;
-        public static MenuScene.SceneID? Monk;
-        public static MenuScene.SceneID? Rivulet;
-        public static MenuScene.SceneID? Hunter;
-    }
+
     public static class Melody
     {
-        public static void LoadMusicEnums()
+        public static void Register()
         {
             approach0 = new(head + nameof(approach0), true);
             approach1 = new(head + nameof(approach1), true);
@@ -56,59 +49,148 @@ public static class StaticStuff
         public static SoundID? approach1;
         public static SoundID? approach2;
         public static SoundID? approach3;
-    }
-    internal static Dictionary<MenuScene.SceneID, SlugcatStats.Name> sceneNameMap = new()
-    {
-        { Ghost_Yellow, Yellow },
-        { Slugcat_Yellow, Yellow },
-        { AltEnd_Monk, Yellow },
-        { Ghost_Red, Red },
-        { Slugcat_Red, Red },
-        { Slugcat_Gourmand, Gourmand },
-        { End_Gourmand, Gourmand },
-        { AltEnd_Gourmand, Gourmand },
-        { AltEnd_Gourmand_Full, Gourmand },
-        { End_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-        { AltEnd_Spearmaster, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-        { Slugcat_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-        { Slugcat_Artificer, Artificer },
-        { Slugcat_Artificer_Robo, Artificer },
-        { Slugcat_Artificer_Robo2, Artificer },
-        { AltEnd_Artificer_Portrait, Artificer },
-        { End_Artificer, Artificer },
-        { Slugcat_Rivulet, Rivulet },
-        { Slugcat_Rivulet_Cell, Rivulet },
-        { End_Rivulet, Rivulet },
-        { AltEnd_Rivulet, Rivulet },
-        { AltEnd_Rivulet_Robe, Rivulet },
-        { Slugcat_Saint, Saint },
-        { SaintMaxKarma, Saint },
-        { End_Saint, Saint },
-        { Slugcat_White, SlugcatStats.Name.White }
-    };
-    internal static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap = new()
-    {
-#pragma warning disable CS8604 // Possible null reference argument.
-        { Yellow, EscapismEndingSlugcatScreen.Monk },
-        { Red, EscapismEndingSlugcatScreen.Hunter },
-        { Gourmand, EscapismEndingSlugcatScreen.Gourmand },
-        { MoreSlugcatsEnums.SlugcatStatsName.Spear, EscapismEndingSlugcatScreen.Spearmaster },
-        { Artificer, EscapismEndingSlugcatScreen.Artificer },
-        { Rivulet, EscapismEndingSlugcatScreen.Rivulet },
-        { White, EscapismEndingSlugcatScreen.Survivor }
-#pragma warning restore CS8604 // Possible null reference argument.
-    };
 
+    }
+}
+public static class StaticStuff
+{
+    public const int TicksPerSecond = 40;
+    public const bool devBuild = true;
+    internal static HashSet<SlugcatStats.Name> EscapismEnding = [];
+    public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> creatures, World world, RainWorldGame game, Destination d)
+    {
+        AbstractRoom room = world.GetAbstractRoom(d.roomName);
+        room.RealizeRoom(world, game);
+        while (world.loadingRooms.Count > 0)
+        {
+
+                for (int j = world.loadingRooms.Count - 1; j >= 0; j--)
+                {
+                    if (world.loadingRooms[j].done)
+                    {
+                        world.loadingRooms.RemoveAt(j);
+                    }
+                    else
+                    {
+                        world.loadingRooms[j].Update();
+                    }
+                }
+            
+        }
+        RWCustom.IntVector2 middleOfRoom = new(room.realizedRoom.TileWidth / 2 + 10, room.realizedRoom.TileHeight / 2);
+        WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.realizedRoom.GetTilePosition(d.position), room.index);
+        creatures.ForEach(creature => creature.pos = destination);
+        creatures.ForEach(player =>
+        {
+            player.RealizeInRoom();
+            player.realizedCreature.mainBodyChunk.pos = d.position;
+        });
+        room.world.game.roomRealizer.followCreature = creatures[0];
+        game.cameras[0].MoveCamera(room.realizedRoom, 0);
+        game.cameras[0].virtualMicrophone.AllQuiet();
+        game.cameras[0].virtualMicrophone.NewRoom(game.cameras[0].room);
+
+
+    }
+    public static ScreenFlasher RegisterScreenFlasher(RoomCamera rCam)
+    {
+        ScreenFlasher screenFlasher = new();
+        rCam.NewObjectInRoom(screenFlasher);
+        MainLogic.globalUpdateReceivers.Add(screenFlasher);
+        return screenFlasher;
+    }
+    public struct Destination
+    {
+        public string roomName;
+        public Vector2 position;
+    }
+}
+public static class PVMaps
+{
+    static PVMaps()
+    {
+        nameSceneMap = new()
+        {
+            { Yellow, PVEnums.Monk },
+            { Red, PVEnums.Hunter },
+            { MoreSlugcatsEnums.SlugcatStatsName.Gourmand, PVEnums.Gourmand },
+            { MoreSlugcatsEnums.SlugcatStatsName.Spear, PVEnums.Spearmaster },
+            { MoreSlugcatsEnums.SlugcatStatsName.Artificer, PVEnums.Artificer },
+            { MoreSlugcatsEnums.SlugcatStatsName.Rivulet, PVEnums.Rivulet },
+            { White, PVEnums.Survivor }
+        };
+        sceneNameMap = new()
+        {
+            { Ghost_Yellow, Yellow },
+            { Slugcat_Yellow, Yellow },
+            { AltEnd_Monk, Yellow },
+            { Ghost_Red, Red },
+            { Slugcat_Red, Red },
+            { Slugcat_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
+            { End_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
+            { AltEnd_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
+            { AltEnd_Gourmand_Full, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
+            { End_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
+            { AltEnd_Spearmaster, MoreSlugcatsEnums.SlugcatStatsName.Spear },
+            { Slugcat_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
+            { Slugcat_Artificer, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
+            { Slugcat_Artificer_Robo, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
+            { Slugcat_Artificer_Robo2, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
+            { AltEnd_Artificer_Portrait, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
+            { End_Artificer, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
+            { Slugcat_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
+            { Slugcat_Rivulet_Cell, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
+            { End_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
+            { AltEnd_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
+            { AltEnd_Rivulet_Robe, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
+            { Slugcat_Saint, Saint },
+            { SaintMaxKarma, Saint },
+            { End_Saint, Saint },
+            { Slugcat_White, SlugcatStats.Name.White }
+        };
+        dreamRoom = new()
+        {
+            { Yellow, new() {roomName = "PV_DREAM_TREE03", position = new(306f, 269f) } },
+            { White, new() {roomName = "PV_DREAM_TREE03", position = new(298.7f, 269.0f) } },
+            { Gourmand, new() {roomName = "PV_DREAM_TREE03", position = new(298.7f, 269.0f) } },
+            { Red, new() {roomName = "PV_DREAM_RED", position = new(4955, 1005) } }
+        };
+        endRoom = new()
+        {
+            { Red, new() { roomName = "END_RED", position = new(482, 349) } }
+        };
+
+
+    }
+
+    #region Maps
+    internal static Dictionary<MenuScene.SceneID, SlugcatStats.Name> sceneNameMap;
+
+    internal static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap;
+
+    internal static Dictionary<SlugcatStats.Name, StaticStuff.Destination> dreamRoom;
+
+    internal static Dictionary<SlugcatStats.Name, StaticStuff.Destination> endRoom;
+    #endregion
+
+    #region Methods
     static internal SlugcatStats.Name GetCharacterFromSelectScene(this MenuScene.SceneID sceneID)
     {
         return sceneNameMap.TryGetValue(sceneID, out var name) ? name : White;
     }
     static internal MenuScene.SceneID GetSelectScreenSceneID(this SlugcatStats.Name character)
     {
-#pragma warning disable CS8603 // Possible null reference return.
-        return nameSceneMap.TryGetValue(character, out var sceneID) ? sceneID : EscapismEndingSlugcatScreen.Survivor;
-#pragma warning restore CS8603 // Possible null reference return.
+        return nameSceneMap.TryGetValue(character, out var sceneID) ? sceneID : PVEnums.Survivor;
     }
+    static internal StaticStuff.Destination GetDreamDestination(this SlugcatStats.Name character)
+    {
+        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "END", position = new(482, 349) };
+    }
+    static internal StaticStuff.Destination GetEndDestination(this SlugcatStats.Name character)
+    {
+        return endRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "END", position = new(482, 349) };
+    }
+    #endregion
 }
 public static class ROMUtils
 {
@@ -137,4 +219,5 @@ public static class ROMUtils
 public interface IReceiveWorldTicks
 {
     public void Update();
+    public bool SlatedForDeletion { get; }
 }

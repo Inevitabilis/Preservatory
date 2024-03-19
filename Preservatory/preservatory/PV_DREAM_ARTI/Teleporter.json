@@ -1,0 +1,30 @@
+{
+  "RoomId": "PV_DREAM_ARTI",
+  "TypeId": "Teleporter",
+  "DataJson": {
+    "VersionId": "0.0.0",
+    "Data": {
+      "delay": 0.0,
+      "isEnabled": true,
+      "function": 0,
+      "Polygon": [
+        {
+          "x": 1672.75,
+          "y": 1219.0
+        },
+        {
+          "x": 1673.75,
+          "y": 977.0
+        },
+        {
+          "x": 1326.25,
+          "y": 986.0
+        },
+        {
+          "x": 1331.25,
+          "y": 1219.0
+        }
+      ]
+    }
+  }
+}

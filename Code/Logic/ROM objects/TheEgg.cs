@@ -128,7 +128,7 @@ internal class TheEgg : BackgroundScene.BackgroundSceneElement
             float num = Vector2.Distance(player.mainBodyChunk.pos, pos);
             musicVolume = Mathf.InverseLerp(Mathf.Lerp(6000f, 11000f, musicVolumeDirectionBoost), 
                 Mathf.Lerp(500f, 3000f, musicVolumeDirectionBoost), 
-                num) 
+                num)
                 * Custom.SCurve(Mathf.InverseLerp(100f, 1600f, (float)counter), 0.6f);
                 
             playerDists.Insert(0, num);
@@ -152,7 +152,7 @@ internal class TheEgg : BackgroundScene.BackgroundSceneElement
             {
                 if (!exitCommand)
                 {
-                    EscapeToDream(room.game);
+                    //EscapeToDream(room.game);
                 }
                 exitCommand = true;
                 fadeWait = 20;
@@ -178,14 +178,5 @@ internal class TheEgg : BackgroundScene.BackgroundSceneElement
             whiteFade = 0.002f;
             room.PlaySound(SoundID.Void_Sea_Swim_Into_Core, 0f, 1f, 1f);
         }
-    }
-
-    private void EscapeToDream(RainWorldGame game)
-    {
-        /*if(game.StoryCharacter == )
-        game.PlayersToProgressOrWin.ForEach(x =>
-        {
-            x.pos.room = 
-        });*/
     }
 }

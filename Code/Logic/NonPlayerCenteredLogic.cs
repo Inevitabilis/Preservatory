@@ -66,7 +66,7 @@ internal class NonPlayerCenteredLogic
     }
     private static void SetSelectScreen(RainWorldGame game) 
     {
-        SlugBase.Assets.CustomScene.SetSelectMenuScene(game.GetStorySession.saveState, StaticStuff.GetSelectScreenSceneID(game.StoryCharacter));
+        SlugBase.Assets.CustomScene.SetSelectMenuScene(game.GetStorySession.saveState, PVMaps.GetSelectScreenSceneID(game.StoryCharacter));
     }
     
 }
