@@ -54,6 +54,7 @@ public static class PVEnums
 }
 public static class StaticStuff
 {
+    public static bool logging = false;
     public const int TicksPerSecond = 40;
     public const bool devBuild = true;
     internal static HashSet<SlugcatStats.Name> EscapismEnding = [];

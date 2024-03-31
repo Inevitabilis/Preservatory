@@ -152,20 +152,26 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
     public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
         sLeaser.sprites = new FSprite[1];
-        sLeaser.sprites[0] = new FSprite("Futile_White", true)
+        for(int i = 0;  i < sLeaser.sprites.Length; i++) 
         {
-            alpha = 0f,
-            shader = rCam.game.rainWorld.Shaders["FlatLightNoisy"]
-        };
+            sLeaser.sprites[i] = new FSprite("Futile_White", true)
+            {
+                alpha = 0f,
+            };
+        }
+        sLeaser.sprites[0].shader = rCam.game.rainWorld.Shaders["FlatLightNoisy"];
         AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Bloom"));
     }
 
     public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        sLeaser.sprites[0].scale = Mathf.Lerp(150f, 1000f, Mathf.Pow(FlareStrength, 4f));
-        sLeaser.sprites[0].alpha = Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
-        sLeaser.sprites[0].x = camPos.x;
-        sLeaser.sprites[0].y = camPos.y;
+        Array.ForEach(sLeaser.sprites, sprite =>
+        {
+            sprite.scale = Mathf.Lerp(150f, 1000f, Mathf.Pow(Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker), 4f));
+            sprite.alpha = Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
+            sprite.SetPosition(camPos);            
+        });
+        
     }
 
     public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)

@@ -13,6 +13,7 @@ namespace PVStuffMod;
 
 internal static class MainLogic
 {
+    public static void Log(string message) => PVStuff.s_logger?.LogDebug(message);
     public static List<IReceiveWorldTicks> globalUpdateReceivers;
     public static InternalSoundController internalSoundController;
     static MainLogic()

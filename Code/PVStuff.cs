@@ -46,7 +46,7 @@ sealed class PVStuff : BaseUnityPlugin
 
     const string K_PV = "PV";
     static ConditionalWeakTable<AbstractCreature, PVProperties> s_props = new();
-    static ManualLogSource? s_logger;
+    public static ManualLogSource? s_logger;
 
     public void OnEnable()
     {

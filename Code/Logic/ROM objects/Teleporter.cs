@@ -63,7 +63,7 @@ public class Teleporter : UpdatableAndDeletable
                         room.PlaySound(SoundID.Void_Sea_Swim_Into_Core, 0f, 1f, 1f);
                         var flasher = RegisterScreenFlasher(room.game.cameras[0]);
                         flasher.TickAtTheEndOfWhiteScreen += Teleportation;
-                        flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 120);
+                        flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 40, ticksToFadeIn: 120);
                     }
                     break;
                 }
@@ -73,6 +73,7 @@ public class Teleporter : UpdatableAndDeletable
     public void Teleportation(int hash)
     {
         if (hash != this.GetHashCode()) return;
+        StaticStuff.logging = true;
         Destination destination = GetDestination(room.game.StoryCharacter);
         room.game.AlivePlayers.TeleportCreaturesIntoRoom(room.world, room.game, destination);
         if(destination.roomName == "PV_DREAM_TREE03")
@@ -82,7 +83,9 @@ public class Teleporter : UpdatableAndDeletable
                 if (x.realizedCreature is Player p)
                 {
                     p.sleepCounter = 100;
-                    
+                    p.sleepWhenStill = false;
+                    p.bodyMode = Player.BodyModeIndex.Crawl;
+                    p.animation = Player.AnimationIndex.DownOnFours;
                 }
             });
         }
@@ -124,7 +127,6 @@ public class DreamEnderOperator : TypeOperator<Teleporter>
 
         float screenWidth = currentScreenRect.width;
         float screenHeight = currentScreenRect.height;
-
         Vector2[] polygon = [
                 center + new Vector2(screenWidth/8, screenHeight/8),
                 center + new Vector2(screenWidth/8, - screenHeight/8),
