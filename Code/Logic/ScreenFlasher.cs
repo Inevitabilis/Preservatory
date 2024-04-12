@@ -11,7 +11,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
 {
     int SummonerHash, ticksToFadeIn, ticksToFadeOut, idlingTicks, colorLerpingTicks;
     Color color, previousColor, colorToLerpTo;
-    State state = State.Idle;
+    State state = State.readyForAction;
     public bool SlatedForDeletion
     {
         get; private set;
@@ -66,17 +66,18 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
     public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill, TickOnCompletion;
     enum State
     {
-        Idle,
+        readyForAction,
         fadingIn,
         idlingFilled,
-        fadingOut
+        fadingOut,
+        waitingForRemoval
     }
 
     public void Update()
     {
         switch (state)
         {
-            case State.Idle:
+            case State.readyForAction:
                 {
                     return;
                 }
@@ -109,7 +110,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
                     {
                         timer = 0;
                         SlatedForDeletion = true;
-                        state = State.Idle;
+                        state = State.waitingForRemoval;
                         TickOnCompletion?.Invoke(SummonerHash);
                     }
                     break;
@@ -135,6 +136,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
         int idleTicks = StaticStuff.TicksPerSecond * 3,
         int ticksToFadeOut = StaticStuff.TicksPerSecond * 1)
     {
+        if (state != State.readyForAction) return;
         SummonerHash = ownerHash;
         this.ticksToFadeIn = ticksToFadeIn;
         idlingTicks = idleTicks;
@@ -167,11 +169,11 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
     {
         Array.ForEach(sLeaser.sprites, sprite =>
         {
-            sprite.scale = Mathf.Lerp(150f, 1000f, Mathf.Pow(Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker), 4f));
+            sprite.scale = Mathf.Lerp(100f, 1000f, Mathf.Pow(Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker), 4f));
             sprite.alpha = Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
-            sprite.SetPosition(camPos);            
+            sprite.color = this.color;
+            sprite.SetPosition(camPos + rCam.sSize/2);            
         });
-        
     }
 
     public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)

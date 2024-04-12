@@ -158,7 +158,7 @@ public static class PVMaps
         };
         endRoom = new()
         {
-            { Red, new() { roomName = "END_RED", position = new(482, 349) } }
+            { Red, new() { roomName = "PV_END_RED", position = new(482, 349) } }
         };
 
 
@@ -185,11 +185,11 @@ public static class PVMaps
     }
     static internal StaticStuff.Destination GetDreamDestination(this SlugcatStats.Name character)
     {
-        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "END", position = new(482, 349) };
+        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(482, 349) };
     }
     static internal StaticStuff.Destination GetEndDestination(this SlugcatStats.Name character)
     {
-        return endRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "END", position = new(482, 349) };
+        return endRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(482, 349) };
     }
     #endregion
 }
@@ -202,19 +202,20 @@ public static class ROMUtils
     }
     public static bool PositionWithinPoly(Vector2[] Polygon, Vector2 point)
     {
+            bool result = true;
         for (int i = 0; i < Polygon.Length; i++)
         {
             Vector2 currentline = Polygon[(i + 1) % Polygon.Length] - Polygon[i];
             Vector2 nextdirline = Polygon[(i + 2) % Polygon.Length] - Polygon[i];
             EquationPosition whereToCheck = nextdirline.GetAngle() - currentline.GetAngle() > 0 ? EquationPosition.below : EquationPosition.above;
-            if (!InAreaForTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point, whereToCheck)) return false;
+            if (IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point) != IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], Polygon[(i+2)%Polygon.Length])) result = false;
         }
-        return true;
+        return result;
     }
-    private static bool InAreaForTwoPoints(Vector2 point1, Vector2 point2, Vector2 v, EquationPosition equationPosition)
+    private static bool IsAboveEquationByTwoPoints(Vector2 point1, Vector2 point2, Vector2 v)
     {
-        if (equationPosition == EquationPosition.above) return (v.x - point1.x) / (point2.x - point1.x) <= (v.y - point1.y) / (point2.y - point1.y);
-        else return (v.x - point1.x) * (point2.y - point1.y) > (v.y - point1.y) * (point2.x - point1.x);
+        bool isAboveLine = (point1.x - v.x) * (point2.y - point1.y) <= (point1.y - v.y) * (point2.x - point1.x);
+        return isAboveLine;
     }
 }
 public interface IReceiveWorldTicks

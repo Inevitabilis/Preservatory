@@ -36,6 +36,7 @@ internal static class MainLogic
                 if(x is IDrawable drawable && !self.cameras[0].spriteLeasers.Exists(x => x.drawableObject == drawable)) self.cameras[0].NewObjectInRoom(drawable);
             });
             globalUpdateReceivers.ForEach(x => x.Update());
+            if (Input.GetKey(KeyCode.Backspace)) StaticStuff.logging = true;
         };
         RegisterROMObjects();
     }

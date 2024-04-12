@@ -42,7 +42,7 @@ public class Teleporter : UpdatableAndDeletable
     #region methods
     public override void Update(bool eu)
     {
-        if (!isEnabled) return;
+        if (!isEnabled || !room.updateList.Exists(UAD => UAD is Player)) return;
         base.Update(eu);
         switch (state)
         {
@@ -62,8 +62,13 @@ public class Teleporter : UpdatableAndDeletable
                         state = State.teleportationProcess;
                         room.PlaySound(SoundID.Void_Sea_Swim_Into_Core, 0f, 1f, 1f);
                         var flasher = RegisterScreenFlasher(room.game.cameras[0]);
+                        flasher.TickOnFill += (int hash) =>
+                        {
+                            if (hash != this.GetHashCode()) return;
+                            flasher.RequestColorChange(Color.black);
+                        };
                         flasher.TickAtTheEndOfWhiteScreen += Teleportation;
-                        flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 40, ticksToFadeIn: 120);
+                        flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 80, ticksToFadeIn: 40);
                     }
                     break;
                 }
@@ -73,7 +78,6 @@ public class Teleporter : UpdatableAndDeletable
     public void Teleportation(int hash)
     {
         if (hash != this.GetHashCode()) return;
-        StaticStuff.logging = true;
         Destination destination = GetDestination(room.game.StoryCharacter);
         room.game.AlivePlayers.TeleportCreaturesIntoRoom(room.world, room.game, destination);
         if(destination.roomName == "PV_DREAM_TREE03")
@@ -94,9 +98,12 @@ public class Teleporter : UpdatableAndDeletable
         void Cleanup(Room room)
         {
             var realizer = room.game.roomRealizer;
-            var tracker = realizer.realizedRooms.First(x => x.room == room.abstractRoom);
             realizer.KillRoom(room.abstractRoom);
-            realizer.realizedRooms.Remove(tracker);
+            if(realizer.realizedRooms.Exists(x => x.room == room.abstractRoom))
+            {
+                var tracker = realizer.realizedRooms.First(x => x.room == room.abstractRoom);
+                realizer.realizedRooms.Remove(tracker);
+            }
         }
 
     }
