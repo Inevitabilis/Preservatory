@@ -67,7 +67,7 @@ public class Teleporter : UpdatableAndDeletable
                             if (hash != this.GetHashCode()) return;
                             flasher.RequestColorChange(Color.black);
                         };
-                        flasher.TickAtTheEndOfWhiteScreen += Teleportation;
+                        flasher.TickInTheMiddleOfIdling += Teleportation;
                         flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 80, ticksToFadeIn: 40);
                     }
                     break;
@@ -90,6 +90,16 @@ public class Teleporter : UpdatableAndDeletable
                     p.sleepWhenStill = false;
                     p.bodyMode = Player.BodyModeIndex.Crawl;
                     p.animation = Player.AnimationIndex.DownOnFours;
+                }
+            });
+        }
+        else
+        {
+            room.game.AlivePlayers.ForEach(x =>
+            {
+                if (x.realizedCreature is Player p)
+                { 
+                    p.bodyMode = Player.BodyModeIndex.Stand;
                 }
             });
         }

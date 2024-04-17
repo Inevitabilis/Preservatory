@@ -8,6 +8,7 @@ using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
 using System.IO;
 using PVStuffMod.Logic;
+using System.Linq;
 
 namespace PVStuffMod;
 
@@ -30,10 +31,10 @@ internal static class MainLogic
         On.RainWorldGame.Update += static (orig, self) =>
         {
             orig(self);
-            GarbageCollector(globalUpdateReceivers, self.cameras);
+            GarbageCollector(globalUpdateReceivers, self.cameras); //ScreenFlasher
             globalUpdateReceivers.ForEach(x =>
             {
-                if(x is IDrawable drawable && !self.cameras[0].spriteLeasers.Exists(x => x.drawableObject == drawable)) self.cameras[0].NewObjectInRoom(drawable);
+                if (x is ScreenFlasher flasher && !self.cameras[0].spriteLeasers.Exists(x => x.drawableObject == flasher)) self.cameras[0].NewObjectInRoom(flasher);
             });
             globalUpdateReceivers.ForEach(x => x.Update());
             if (Input.GetKey(KeyCode.Backspace)) StaticStuff.logging = true;

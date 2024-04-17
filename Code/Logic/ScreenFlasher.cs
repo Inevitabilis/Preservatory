@@ -61,9 +61,10 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             }
         }
     }
+    public bool testingCenterOfScreen = true;
 
 
-    public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill, TickOnCompletion;
+    public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill, TickOnCompletion, TickInTheMiddleOfIdling;
     enum State
     {
         readyForAction,
@@ -95,6 +96,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             case State.idlingFilled:
                 {
                     timer++;
+                    if(timer == idlingTicks/2) TickInTheMiddleOfIdling?.Invoke(SummonerHash);
                     if (timer >= idlingTicks)
                     {
                         timer = 0;
@@ -153,7 +155,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
     #region Graphics
     public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
-        sLeaser.sprites = new FSprite[1];
+        sLeaser.sprites = new FSprite[testingCenterOfScreen ? 2 : 1];
         for(int i = 0;  i < sLeaser.sprites.Length; i++) 
         {
             sLeaser.sprites[i] = new FSprite("Futile_White", true)
@@ -172,8 +174,14 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             sprite.scale = Mathf.Lerp(100f, 1000f, Mathf.Pow(Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker), 4f));
             sprite.alpha = Mathf.Lerp(PreviousFrameFlareStrength, FlareStrength, timeStacker);
             sprite.color = this.color;
-            sprite.SetPosition(camPos + rCam.sSize/2);            
+            sprite.SetPosition(rCam.sSize/2);            
         });
+        if(testingCenterOfScreen)
+        {
+            sLeaser.sprites[1].color = Color.green;
+            sLeaser.sprites[1].alpha = 1f;
+            sLeaser.sprites[1].scale = 1f;
+        }
     }
 
     public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)

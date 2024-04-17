@@ -154,7 +154,8 @@ public static class PVMaps
             { Yellow, new() {roomName = "PV_DREAM_TREE03", position = new(306f, 269f) } },
             { White, new() {roomName = "PV_DREAM_TREE03", position = new(298.7f, 269.0f) } },
             { Gourmand, new() {roomName = "PV_DREAM_TREE03", position = new(298.7f, 269.0f) } },
-            { Red, new() {roomName = "PV_DREAM_RED", position = new(4955, 1005) } }
+            { Artificer, new() {roomName = "PV_DREAM_ARTI", position = new(534f, 84f)} },
+            { Red, new() { roomName = "PV_DREAM_RED", position = new(4962, 1024) } }
         };
         endRoom = new()
         {
