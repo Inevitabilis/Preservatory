@@ -7,10 +7,6 @@ namespace PVStuffMod;
 
 internal class NonPlayerCenteredLogic
 {
-    internal static void ApplyHooks()
-    {
-    }
-
     internal static void BeatGameModeStasis(RainWorldGame game)
     {
         AppendStatistics(game);
