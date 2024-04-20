@@ -63,6 +63,7 @@ internal static class MainLogic
     {
         TypeOperator.RegisterType<ExposedSoundControllerOperator>();
         TypeOperator.RegisterType<DreamEnderOperator>();
+        TypeOperator.RegisterType<VatSceneOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
