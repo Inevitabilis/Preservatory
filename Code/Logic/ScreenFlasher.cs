@@ -61,7 +61,7 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             }
         }
     }
-    public bool testingCenterOfScreen = true;
+    public bool testingCenterOfScreen = false;
 
 
     public event Action<int>? TickAtTheEndOfWhiteScreen, TickOnFill, TickOnCompletion, TickInTheMiddleOfIdling;
