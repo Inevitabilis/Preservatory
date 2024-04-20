@@ -1,0 +1,11 @@
+{
+  "RoomId": "PV_END_RED",
+  "TypeId": "VatScene",
+  "DataJson": {
+    "VersionId": "0.0.0",
+    "Data": {
+      "isEnabled": true,
+      "delayBeforeFlash": 5.0
+    }
+  }
+}
