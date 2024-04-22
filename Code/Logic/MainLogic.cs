@@ -9,6 +9,7 @@ using ROM.RoomObjectService;
 using System.IO;
 using PVStuffMod.Logic;
 using System.Linq;
+using PVStuff.Logic.ROM_objects;
 
 namespace PVStuffMod;
 
@@ -64,6 +65,7 @@ internal static class MainLogic
         TypeOperator.RegisterType<ExposedSoundControllerOperator>();
         TypeOperator.RegisterType<DreamEnderOperator>();
         TypeOperator.RegisterType<VatSceneOperator>();
+        TypeOperator.RegisterType<RedIllnessOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {

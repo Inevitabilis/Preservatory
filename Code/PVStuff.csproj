@@ -9,9 +9,6 @@
     <Compile Remove="Logic\TheEgg.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Logic\ROM objects\TheEgg.cs" />
-  </ItemGroup>
-  <ItemGroup>
 	  <Reference Include="References/*.dll">
 		  <Private>false</Private>
 	  </Reference>
