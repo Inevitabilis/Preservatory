@@ -196,20 +196,13 @@ public static class PVMaps
 }
 public static class ROMUtils
 {
-    private enum EquationPosition
-    {
-        above,
-        below
-    }
     public static bool PositionWithinPoly(Vector2[] Polygon, Vector2 point)
     {
             bool result = true;
         for (int i = 0; i < Polygon.Length; i++)
         {
-            Vector2 currentline = Polygon[(i + 1) % Polygon.Length] - Polygon[i];
-            Vector2 nextdirline = Polygon[(i + 2) % Polygon.Length] - Polygon[i];
-            EquationPosition whereToCheck = nextdirline.GetAngle() - currentline.GetAngle() > 0 ? EquationPosition.below : EquationPosition.above;
-            if (IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point) != IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], Polygon[(i+2)%Polygon.Length])) result = false;
+            if (IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point) 
+                != IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], Polygon[(i+2)%Polygon.Length])) result = false;
         }
         return result;
     }
