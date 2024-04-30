@@ -66,6 +66,7 @@ internal static class MainLogic
         TypeOperator.RegisterType<DreamEnderOperator>();
         TypeOperator.RegisterType<VatSceneOperator>();
         TypeOperator.RegisterType<RedIllnessOperator>();
+        TypeOperator.RegisterType<HLLOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
