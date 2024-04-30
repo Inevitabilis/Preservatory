@@ -1,0 +1,30 @@
+{
+  "RoomId": "PV_DREAM_RED",
+  "TypeId": "RedInducedIllness",
+  "DataJson": {
+    "VersionId": "0.0.0",
+    "Data": {
+      "delay": 0.0,
+      "asthmaSeconds": 5.288346,
+      "triggersMalnourishment": true,
+      "Polygon": [
+        {
+          "x": 3532.75,
+          "y": 1236.00024
+        },
+        {
+          "x": 3402.75,
+          "y": 871.000244
+        },
+        {
+          "x": 3187.25,
+          "y": 916.000244
+        },
+        {
+          "x": 3099.25,
+          "y": 1237.00024
+        }
+      ]
+    }
+  }
+}

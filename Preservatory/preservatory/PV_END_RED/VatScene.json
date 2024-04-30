@@ -4,8 +4,8 @@
   "DataJson": {
     "VersionId": "0.0.0",
     "Data": {
-      "isEnabled": true,
-      "delayBeforeFlash": 5.0
+      "isEnabled": false,
+      "delayBeforeFlash": 10.0
     }
   }
 }
