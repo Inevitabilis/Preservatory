@@ -52,7 +52,7 @@ public class HLL : UpdatableAndDeletable
         for(int i = 0; i < tnt.Length; i++) 
         {
             var chunk = tnt[i].Tip;
-            chunk.pos = (polygon[i%polygon.Length]) + new Vector2(Perlin(counter+i*20f), Perlin(-counter+i*20f)) * amplitude;
+            chunk.pos = (polygon[i%polygon.Length]) + new Vector2(Perlin(counter+i*20f), Perlin(-counter-i*20f)) * amplitude;
         }
         
     }
