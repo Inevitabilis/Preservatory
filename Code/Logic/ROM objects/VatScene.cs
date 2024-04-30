@@ -26,11 +26,15 @@ public class VatScene : UpdatableAndDeletable
 
     public override void Update(bool eu)
     {
+        room.game.Players.ForEach(absply =>
+        {
+            if (absply.realizedCreature is Player player) player.airInLungs = 1f;
+        });
         if (!isEnabled || !room.updateList.Exists(UAD => UAD is Player)) return;
         base.Update(eu);
         room.game.Players.ForEach(absply =>
         {
-            if (absply.realizedCreature is Player player) { player.airInLungs = 1f; }
+            if (absply.realizedCreature is Player player) player.stun = 100;
         });
         switch(state)
         {
@@ -50,7 +54,7 @@ public class VatScene : UpdatableAndDeletable
                     {
                         state = State.flashCommencing;
                         ScreenFlasher flasher = StaticStuff.RegisterScreenFlasher(room.game.cameras[0]);
-                        flasher.TickOnCompletion += Ending;
+                        flasher.TickInTheMiddleOfIdling += Ending;
                         flasher.RequestScreenFlash(this.GetHashCode(), Color.black);
                     }
                     break;
