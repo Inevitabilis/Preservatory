@@ -58,6 +58,7 @@ public static class StaticStuff
     public const int TicksPerSecond = 40;
     public const bool devBuild = true;
     internal static HashSet<SlugcatStats.Name> EscapismEnding = [];
+    public static Vector2 centerOfOneScreenRoom = new(482, 349);
     public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> creatures, World world, RainWorldGame game, Destination d)
     {
         AbstractRoom room = world.GetAbstractRoom(d.roomName);
@@ -186,11 +187,11 @@ public static class PVMaps
     }
     static internal StaticStuff.Destination GetDreamDestination(this SlugcatStats.Name character)
     {
-        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(482, 349) };
+        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(0,0) }; //yes the player actually needs to not be noticed, with hunter long legs replacing it
     }
     static internal StaticStuff.Destination GetEndDestination(this SlugcatStats.Name character)
     {
-        return endRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(482, 349) };
+        return endRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = StaticStuff.centerOfOneScreenRoom };
     }
     #endregion
 }
