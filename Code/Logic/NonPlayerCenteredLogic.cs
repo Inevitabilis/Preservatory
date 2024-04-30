@@ -12,6 +12,8 @@ internal class NonPlayerCenteredLogic
         AppendStatistics(game);
         UpdateSaveState(game);
         SetSelectScreen(game);
+        game.ExitGame(false, false);
+        game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 0);
     }
     private static void UpdateSaveState(RainWorldGame game)
     {
