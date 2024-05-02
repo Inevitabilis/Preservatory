@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using PVStuffMod.Logic;
 using IL.RWCustom;
 using Newtonsoft.Json.Serialization;
+using System;
 
 namespace PVStuffMod;
 
@@ -56,8 +57,8 @@ public static class StaticStuff
 {
     public static bool logging = false;
     public const int TicksPerSecond = 40;
-    public const bool devBuild = true;
-    internal static HashSet<SlugcatStats.Name> EscapismEnding = [];
+    public const bool devBuild = false;
+
     public static Vector2 centerOfOneScreenRoom = new(482, 349);
     public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> creatures, World world, RainWorldGame game, Destination d)
     {

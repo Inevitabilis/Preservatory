@@ -1,4 +1,5 @@
-﻿using SlugBase;
+﻿using PVStuff.Logic;
+using SlugBase;
 using System.Collections.Generic;
 using System.Linq;
 using static MoreSlugcats.MoreSlugcatsEnums;
@@ -64,7 +65,8 @@ internal class NonPlayerCenteredLogic
     }
     private static void SetSelectScreen(RainWorldGame game) 
     {
-        SlugBase.Assets.CustomScene.SetSelectMenuScene(game.GetStorySession.saveState, PVMaps.GetSelectScreenSceneID(game.StoryCharacter));
+        SaveManager.AppendSlugcat(game.rainWorld.options.saveSlot, game.GetStorySession.saveStateNumber);
+        SaveManager.UpdateDiskSave();
     }
     
 }

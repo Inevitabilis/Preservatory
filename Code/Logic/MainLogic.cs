@@ -10,6 +10,7 @@ using System.IO;
 using PVStuffMod.Logic;
 using System.Linq;
 using PVStuff.Logic.ROM_objects;
+using PVStuff.Logic;
 
 namespace PVStuffMod;
 
@@ -18,6 +19,7 @@ internal static class MainLogic
     public static void Log(string message) => PVStuff.s_logger?.LogDebug(message);
     public static List<IReceiveWorldTicks> globalUpdateReceivers;
     public static InternalSoundController internalSoundController;
+    static bool initialized = false;
     static MainLogic()
     {
         internalSoundController = new();
@@ -25,6 +27,7 @@ internal static class MainLogic
     }
     static internal void Startup()
     {
+        if (initialized) return;
         //Scene related changes
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
         PVEnums.Melody.Register();
@@ -41,6 +44,8 @@ internal static class MainLogic
             if (Input.GetKey(KeyCode.Backspace)) StaticStuff.logging = true;
         };
         RegisterROMObjects();
+        SaveManager.ApplyHooks();
+        initialized = true;
     }
 
     private static void GarbageCollector(List<IReceiveWorldTicks> list, RoomCamera[] cameras)
@@ -70,7 +75,7 @@ internal static class MainLogic
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
-        if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || EscapismEnding.Contains(self.sceneID.GetCharacterFromSelectScene())))
+        if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot,self.sceneID.GetCharacterFromSelectScene())))
             self.sceneID = self.sceneID.GetCharacterFromSelectScene().GetSelectScreenSceneID();
         orig(self);
     }
