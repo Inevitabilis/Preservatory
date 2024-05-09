@@ -58,6 +58,7 @@ public static class StaticStuff
     public static bool logging = false;
     public const int TicksPerSecond = 40;
     public const bool devBuild = true;
+    public static short[] playerColorableSpritesIndices = [0,1,2,3,4,5,6,7,8,9];
 
     public static Vector2 centerOfOneScreenRoom = new(482, 349);
     public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> creatures, World world, RainWorldGame game, Destination d)
