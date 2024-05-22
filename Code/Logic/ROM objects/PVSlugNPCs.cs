@@ -1,9 +1,7 @@
-﻿using Microsoft.SqlServer.Server;
-using MoreSlugcats;
+﻿using MoreSlugcats;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PVStuffMod;
-using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
 using ROM.UserInteraction.InroomManagement;
 using ROM.UserInteraction.ObjectEditorElement;
@@ -12,45 +10,157 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PVStuff.Logic.ROM_objects;
 
 public class PVSlugNPC : UpdatableAndDeletable
 {
-    public Vector2 point = new Vector2(500, 600);
+    #region exposed variables
+    public Vector2 point = new(500, 600);
+    public Vector2[] path = [
+            new Vector2(500, 500),
+            new Vector2(500, 600),
+            new Vector2(600, 600),
+            new Vector2(600, 500)
+        ];
+    public Vector2[] FollowPlayerActiveZone = [
+            new Vector2(500, 500),
+            new Vector2(500, 600),
+            new Vector2(600, 600),
+            new Vector2(600, 500)
+        ];
     public bool fullgrown = true;
     public bool forcepos = false;
     public SpecialNPC whoami;
-    public Color color;
+    public Behaviour behaviour;
+    public float playerRelationship;
+    [JsonIgnore]
+    public Color color = new (1f,1f,1f);
+    
+    internal SerializableColor Serializablecolor
+    {
+        get
+        {
+            return new SerializableColor(color);
+        }
+        set
+        {
+            color = new Color(value.r, value.g, value.b, value.a);
+        }
+    }
+    internal struct SerializableColor
+    {
+        public float r;
+        public float g;
+        public float b;
+        public float a;
+        public SerializableColor(Color color)
+        {
+            r = color.r;
+            g = color.g;
+            b = color.b;
+            a = color.a;
+        }
+    }
+    #endregion
+    #region staticStuff
     public enum SpecialNPC
     {
         none,
         monk,
         survivor,
-        gourmand
+        gourmand,
+        artiBrothers
+    }
+    public enum Behaviour
+    {
+        sleeping,
+        standing,
+        cycling,
+        followPlayer
     }
 
+    private const float playerApproachDisengageRange = 20f;
+    #endregion
+    #region runtime required references
+    /// <summary>
+    /// those are references that don't need to be saved
+    /// </summary>
+    [JsonIgnore]
+    private short currentPathingIndex = 0;
     [JsonIgnore]
     AbstractCreature? abstractSlug;
+    [JsonIgnore]
+    Player? followingPlayer;
+    [JsonIgnore]
+    Behaviour lastBehaviour;
+    #endregion
     public override void Update(bool eu)
     {
-        if(!ShouldSpawnForThisSlugcat() || !room.game.Players.Exists(absPly => absPly.Room == room.abstractRoom)) return;
+        if (!ShouldSpawnForThisSlugcat() || !room.game.Players.Exists(absPly => absPly.Room == room.abstractRoom)) return;
+        if (StaticStuff.devBuild && Input.GetKey(KeyCode.V)) ResetSlug();
         ErrorHandling();
         if (abstractSlug == null || abstractSlug.realizedCreature == null) throw new Exception("something's wrong"); //to wade off warnings
-        if (abstractSlug.abstractAI is SlugNPCAbstractAI absAI) absAI.toldToStay = new WorldCoordinate?(room.ToWorldCoordinate(point));
+        CognitiveFunctions();
         if (forcepos) abstractSlug.realizedCreature.mainBodyChunk.pos = point;
-        if (StaticStuff.devBuild && Input.GetKey(KeyCode.KeypadEnter)) ResetSlug();
         if (StaticStuff.devBuild) UpdateColor();
+
     }
-    void UpdateColor()
+    #region major helping functions
+    void CognitiveFunctions()
     {
-        var sleaser = room.game.cameras[0].spriteLeasers.FirstOrDefault(x => x.drawableObject == abstractSlug.realizedCreature);
-        for (short i = 0; i < sleaser.sprites.Length; i++)
+        if (lastBehaviour != behaviour) OnBehaviourChange();
+        lastBehaviour = behaviour;
+        if (abstractSlug.abstractAI is SlugNPCAbstractAI absAI && absAI.RealAI is SlugNPCAI realAI)
         {
-            if (StaticStuff.playerColorableSpritesIndices.Contains(i)) sleaser.sprites[i].color = color;
+            switch (behaviour)
+            {
+                case Behaviour.sleeping:
+                    {
+                        realAI.behaviorType = PVEnums.NPCBehaviour.completelyStill;
+                        realAI.nap = true;
+                        realAI.cat.animation = Player.AnimationIndex.None;
+                        break;
+                    }
+                case Behaviour.standing:
+                    {
+                        break;
+                    }
+                case Behaviour.cycling:
+                    {
+                        if (Vector2.Distance(abstractSlug.realizedCreature.mainBodyChunk.pos, point) < 10f) realAI.SetDestination(GetNewDestination());
+                        break;
+                    }
+                case Behaviour.followPlayer:
+                    {
+                        FollowingLogic(absAI, realAI);
+                        break;
+                    }
+            }
+        }
+    }
+    private void FollowingLogic(SlugNPCAbstractAI absAI, SlugNPCAI realAI)
+    {
+        absAI.toldToStay = null;
+        if (followingPlayer == null)
+        {
+            var playersWithinZone = room.game.AlivePlayers.Select(x => x.realizedCreature).Where(x => ROMUtils.PositionWithinPoly(FollowPlayerActiveZone, x.mainBodyChunk.pos));
+            if (playersWithinZone.Any())
+            {
+                followingPlayer = playersWithinZone.First() as Player;
+                realAI.friendTracker.friend = followingPlayer;
+                realAI.behaviorType = SlugNPCAI.BehaviorType.Following;
+            }
+        }
+        else
+        {
+            if (!ROMUtils.PositionWithinPoly(FollowPlayerActiveZone, followingPlayer.mainBodyChunk.pos))
+            {
+                realAI.friendTracker.friend = null;
+                realAI.behaviorType = SlugNPCAI.BehaviorType.Idle;
+                followingPlayer = null;
+            }
         }
     }
     public void Initiate()
@@ -62,12 +172,72 @@ public class PVSlugNPC : UpdatableAndDeletable
         room.abstractRoom.AddEntity(abstractSlug);
         abstractSlug.RealizeInRoom();
         UpdateColor();
+        MainLogic.Log("i realised");
+        if (whoami == SpecialNPC.artiBrothers) room.updateList.ForEach(x =>
+        {
+            if (x is PVSlugNPC npc
+            && npc != this
+            && npc.whoami == SpecialNPC.artiBrothers
+            && npc.abstractSlug != null)
+            {
+                var relationship = abstractSlug.state.socialMemory.GetOrInitiateRelationship(npc.abstractSlug.ID);
+                relationship.InfluenceLike(1f);
+                relationship.InfluenceTempLike(1f);
+            }
+        });
+    }
+    public void ResetSlug()
+    {
+        if (abstractSlug != null)
+        {
+            abstractSlug.realizedCreature.slatedForDeletetion = true;
+            abstractSlug.slatedForDeletion = true;
+            abstractSlug = null;
+        }
+        Initiate();
+    }
+    #endregion
+    #region minor helper functions
+    void OnBehaviourChange()
+    {
+        if (abstractSlug.abstractAI.RealAI is SlugNPCAI realAI)
+        {
+            realAI.nap = false;
+            realAI.behaviorType = PVEnums.NPCBehaviour.completelyStill;
+            realAI.SetDestination(default);
+        }
+    }
+    void UpdateColor()
+    {
+        //var stats = (abstractSlug.realizedCreature as Player).npcStats;
+        //var hsl = RWCustom.Custom.RGB2HSL(color);
+        OverrideColors(color);
     }
 
+    private void OverrideColors(Color color)
+    {
+        var rcam = room.game.cameras.FirstOrDefault(x => x.spriteLeasers.Exists(x => x.drawableObject == abstractSlug.realizedCreature.graphicsModule));
+        if (rcam == default) return;
+        MainLogic.Log("exists rcam");
+        var sLeaser = rcam.spriteLeasers.FirstOrDefault(x => x.drawableObject == abstractSlug.realizedCreature.graphicsModule);
+        if(sLeaser == default) return;
+        MainLogic.Log("found needed sleaser");
+        foreach (var sprite in sLeaser.sprites)
+        {
+            sprite.color = color;
+        }
+    }
+
+    static void assignHSL(Player.NPCStats stats, Color color)
+    {
+        stats.H = color.r;
+        stats.S = color.g;
+        stats.L = color.b;
+    }
     private bool ShouldSpawnForThisSlugcat()
     {
-        if(whoami == SpecialNPC.none) return true;
-        if(room.game.session is StoryGameSession story)
+        if (whoami == SpecialNPC.none || whoami == SpecialNPC.artiBrothers) return true;
+        if (room.game.session is StoryGameSession story)
         {
             return (story.characterStats.name == SlugcatStats.Name.White && (whoami == SpecialNPC.gourmand || whoami == SpecialNPC.monk))
                 || (story.characterStats.name == SlugcatStats.Name.Yellow && (whoami == SpecialNPC.survivor || whoami == SpecialNPC.gourmand))
@@ -75,30 +245,35 @@ public class PVSlugNPC : UpdatableAndDeletable
         }
         return true;
     }
-
-    public void ResetSlug()
-    {
-        if (abstractSlug != null)
-        {
-            room.updateList.Remove(abstractSlug.realizedCreature);
-            room.abstractRoom.RemoveEntity(abstractSlug);
-        }
-        Initiate();
-    }
     void ErrorHandling()
     {
         if (abstractSlug == null) throw new Exception("abstractslug is null");
         if (abstractSlug != null && abstractSlug.realizedCreature == null) throw new Exception("abstractslug didn't have realized creature");
     }
+    private WorldCoordinate GetNewDestination()
+    {
+        WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.GetTilePosition(path[currentPathingIndex]), room.abstractRoom.index);
+        currentPathingIndex = (short)((currentPathingIndex + 1) % path.Length);
+        return destination;
+    }
     public override void Destroy()
     {
         if (abstractSlug != null)
         {
+            Array.ForEach(room.game.cameras, cam => RemoveObject(cam.spriteLeasers, abstractSlug.realizedCreature.graphicsModule));
             room.updateList.Remove(abstractSlug.realizedCreature);
             room.abstractRoom.RemoveEntity(abstractSlug);
         }
         base.Destroy();
     }
+    static void RemoveObject(List<RoomCamera.SpriteLeaser> sleaser, IDrawable obj)
+    {
+        for(int i = 0; i < sleaser.Count; i++)
+        {
+            if (sleaser[i].drawableObject == obj) sleaser[i].CleanSpritesAndRemove();
+        }
+    }
+    #endregion
 }
 
 
@@ -111,8 +286,14 @@ public class PVSlugNPCOperator : TypeOperator<PVSlugNPC>
 
     public override void AddToRoom(PVSlugNPC obj, Room room)
     {
-        room.AddObject(obj);
-        obj.Initiate();
+        try
+        {
+            obj.Initiate();
+            room.AddObject(obj);
+        }
+        catch (Exception e)
+        { MainLogic.Log(e.ToString()); }
+
     }
 
     public override PVSlugNPC CreateNew(Room room, Rect currentCameraRect)
@@ -122,16 +303,19 @@ public class PVSlugNPCOperator : TypeOperator<PVSlugNPC>
 
     public override IEnumerable<IObjectEditorElement> GetEditorElements(PVSlugNPC obj, Room room)
     {
-        yield return Elements.Point("Position", "p", () => obj.point, x => obj.point = x);
-        yield return Elements.Checkbox("Fullgrown?", () => obj.fullgrown, x => obj.fullgrown = x);
+        yield return Elements.CollapsableOptionSelect("BehaviourType", () => obj.behaviour, x => obj.behaviour = x);
+        yield return Elements.Point("Position (for still behaviour)", "p", () => obj.point, x => obj.point = x);
         yield return Elements.Checkbox("Force position?", () => obj.forcepos, x => obj.forcepos = x);
+        yield return Elements.Polygon("pathing (for dynamic behaviour)", obj.path);
+        yield return Elements.Polygon("Area of frolicking and following (for following behaviour)", obj.FollowPlayerActiveZone);
+        yield return Elements.Scrollbar("Player Relationship", () => obj.playerRelationship, x => obj.playerRelationship = x);
+        yield return Elements.Checkbox("Fullgrown?", () => obj.fullgrown, x => obj.fullgrown = x);
+        yield return Elements.Scrollbar("R", () => obj.color.r, x => obj.color.r = x);
+        yield return Elements.Scrollbar("G", () => obj.color.g, x => obj.color.g = x);
+        yield return Elements.Scrollbar("B", () => obj.color.b, x => obj.color.b = x);
         yield return Elements.CollapsableOptionSelect("who am i?", () => obj.whoami, x => obj.whoami = x);
         TextFieldConfiguration<Color> configuration = new TextFieldConfiguration<Color>(
             formatter: Format, parser: TryParse, (_) => true, null);
-        yield return Elements.TextField(displayName: "Color",
-            getter: () => obj.color,
-            setter: value => obj.color = value,
-            configuration: configuration);
     }
 
     public override PVSlugNPC Load(JToken dataJson, Room room)

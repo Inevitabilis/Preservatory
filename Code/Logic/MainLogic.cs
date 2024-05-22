@@ -31,6 +31,7 @@ internal static class MainLogic
         //Scene related changes
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
         PVEnums.Melody.Register();
+        PVEnums.NPCBehaviour.Register();
         //for things that do not receive local updates
         On.RainWorldGame.Update += static (orig, self) =>
         {
