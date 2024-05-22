@@ -36,8 +36,8 @@ public class PVSlugNPC : UpdatableAndDeletable
     public Behaviour behaviour;
     public float playerRelationship;
     [JsonIgnore]
-    public Color color = new (1f,1f,1f);
-    
+    public Color color = new(1f, 1f, 1f);
+
     internal SerializableColor Serializablecolor
     {
         get
@@ -118,9 +118,7 @@ public class PVSlugNPC : UpdatableAndDeletable
             {
                 case Behaviour.sleeping:
                     {
-                        realAI.behaviorType = PVEnums.NPCBehaviour.completelyStill;
-                        realAI.nap = true;
-                        realAI.cat.animation = Player.AnimationIndex.None;
+                        
                         break;
                     }
                 case Behaviour.standing:
@@ -205,6 +203,32 @@ public class PVSlugNPC : UpdatableAndDeletable
             realAI.nap = false;
             realAI.behaviorType = PVEnums.NPCBehaviour.completelyStill;
             realAI.SetDestination(default);
+
+            switch (behaviour)
+            {
+                case Behaviour.sleeping:
+                    {
+                        realAI.nap = true;
+                        realAI.cat.bodyMode = Player.BodyModeIndex.Crawl;
+
+                        break;
+                    }
+                case Behaviour.standing:
+                    {
+                        realAI.cat.bodyMode = Player.BodyModeIndex.Stand;
+                        break;
+                    }
+                case Behaviour.followPlayer:
+                    {
+                        break;
+                    }
+                case Behaviour.cycling:
+                    {
+                        realAI.AddModule(new StandardPather(realAI, room.world, abstractSlug));
+                        realAI.pathFinder.stepsPerFrame = 30;
+                        break;
+                    }
+            }
         }
     }
     void UpdateColor()
@@ -218,13 +242,11 @@ public class PVSlugNPC : UpdatableAndDeletable
     {
         var rcam = room.game.cameras.FirstOrDefault(x => x.spriteLeasers.Exists(x => x.drawableObject == abstractSlug.realizedCreature.graphicsModule));
         if (rcam == default) return;
-        MainLogic.Log("exists rcam");
         var sLeaser = rcam.spriteLeasers.FirstOrDefault(x => x.drawableObject == abstractSlug.realizedCreature.graphicsModule);
-        if(sLeaser == default) return;
-        MainLogic.Log("found needed sleaser");
-        foreach (var sprite in sLeaser.sprites)
+        if (sLeaser == default) return;
+        for(ushort i = 0; i<sLeaser.sprites.Length; i++)
         {
-            sprite.color = color;
+            if(Array.Exists(StaticStuff.playerColorableSpritesIndices, x => x == i)) sLeaser.sprites[i].color = color;
         }
     }
 
@@ -268,7 +290,7 @@ public class PVSlugNPC : UpdatableAndDeletable
     }
     static void RemoveObject(List<RoomCamera.SpriteLeaser> sleaser, IDrawable obj)
     {
-        for(int i = 0; i < sleaser.Count; i++)
+        for (int i = 0; i < sleaser.Count; i++)
         {
             if (sleaser[i].drawableObject == obj) sleaser[i].CleanSpritesAndRemove();
         }
