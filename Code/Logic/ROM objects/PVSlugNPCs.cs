@@ -80,7 +80,11 @@ public class PVSlugNPC : UpdatableAndDeletable
         cycling,
         followPlayer
     }
+    public static HashSet<AbstractCreature> sleepingSlugcats = new HashSet<AbstractCreature>();
+    public static void ApplyHooks()
+    {
 
+    }
     private const float playerApproachDisengageRange = 20f;
     #endregion
     #region runtime required references
@@ -98,7 +102,8 @@ public class PVSlugNPC : UpdatableAndDeletable
     #endregion
     public override void Update(bool eu)
     {
-        if (!ShouldSpawnForThisSlugcat() || !room.game.Players.Exists(absPly => absPly.Room == room.abstractRoom)) return;
+        if (!ShouldSpawnForThisSlugcat() || !room.game.Players.Exists(absPly => absPly.realizedCreature.room == room)) return;
+        if(abstractSlug == null) Initiate();
         if (StaticStuff.devBuild && Input.GetKey(KeyCode.V)) ResetSlug();
         ErrorHandling();
         if (abstractSlug == null || abstractSlug.realizedCreature == null) throw new Exception("something's wrong"); //to wade off warnings
@@ -112,13 +117,19 @@ public class PVSlugNPC : UpdatableAndDeletable
     {
         if (lastBehaviour != behaviour) OnBehaviourChange();
         lastBehaviour = behaviour;
-        if (abstractSlug.abstractAI is SlugNPCAbstractAI absAI && absAI.RealAI is SlugNPCAI realAI)
+        if (abstractSlug.abstractAI is SlugNPCAbstractAI absAI && absAI.RealAI is SlugNPCAI realAI && abstractSlug.realizedCreature is Player player)
         {
             switch (behaviour)
             {
                 case Behaviour.sleeping:
                     {
-                        
+                        player.standing = false;
+                        player.sleepCounter = -1;
+                        player.bodyMode = Player.BodyModeIndex.Crawl;
+                        player.animation = Player.AnimationIndex.DownOnFours;
+                        player.forceSleepCounter = 210;
+                        player.wantToJump = 0;
+                        //player.stun = 100;
                         break;
                     }
                 case Behaviour.standing:
@@ -170,7 +181,6 @@ public class PVSlugNPC : UpdatableAndDeletable
         room.abstractRoom.AddEntity(abstractSlug);
         abstractSlug.RealizeInRoom();
         UpdateColor();
-        MainLogic.Log("i realised");
         if (whoami == SpecialNPC.artiBrothers) room.updateList.ForEach(x =>
         {
             if (x is PVSlugNPC npc
@@ -310,11 +320,12 @@ public class PVSlugNPCOperator : TypeOperator<PVSlugNPC>
     {
         try
         {
-            obj.Initiate();
+
             room.AddObject(obj);
         }
         catch (Exception e)
-        { MainLogic.Log(e.ToString()); }
+        {   
+            MainLogic.Log(e.ToString()); }
 
     }
 
