@@ -80,11 +80,8 @@ public class PVSlugNPC : UpdatableAndDeletable
         cycling,
         followPlayer
     }
-    public static HashSet<AbstractCreature> sleepingSlugcats = new HashSet<AbstractCreature>();
     public static void ApplyHooks()
-    {
-
-    }
+    { }
     private const float playerApproachDisengageRange = 20f;
     #endregion
     #region runtime required references
@@ -92,25 +89,29 @@ public class PVSlugNPC : UpdatableAndDeletable
     /// those are references that don't need to be saved
     /// </summary>
     [JsonIgnore]
+    //for switching between what points slugcat wants to go to right now
     private short currentPathingIndex = 0;
     [JsonIgnore]
+    //the manipulated object
     AbstractCreature? abstractSlug;
     [JsonIgnore]
+    //for when the mode is for following player
     Player? followingPlayer;
     [JsonIgnore]
+    //for detecting behaviour change
     Behaviour lastBehaviour;
+    uint tickcounter = 0;
     #endregion
     public override void Update(bool eu)
     {
+        tickcounter++;
         if (!ShouldSpawnForThisSlugcat() || !room.game.Players.Exists(absPly => absPly.realizedCreature.room == room)) return;
-        if(abstractSlug == null) Initiate();
+        if (abstractSlug == null) Initiate();
         if (StaticStuff.devBuild && Input.GetKey(KeyCode.V)) ResetSlug();
         ErrorHandling();
-        if (abstractSlug == null || abstractSlug.realizedCreature == null) throw new Exception("something's wrong"); //to wade off warnings
         CognitiveFunctions();
-        if (forcepos) abstractSlug.realizedCreature.mainBodyChunk.pos = point;
+        if (forcepos) ApplySaintSleeping(((Player)abstractSlug.realizedCreature), point);
         if (StaticStuff.devBuild) UpdateColor();
-
     }
     #region major helping functions
     void CognitiveFunctions()
@@ -123,13 +124,14 @@ public class PVSlugNPC : UpdatableAndDeletable
             {
                 case Behaviour.sleeping:
                     {
+                        //this behaviour is largely copypasted from Saint intro MSC room specific script. Except slugpup jumps when it is touched by anyone. Null controller helps it a lot though
+                        player.touchedNoInputCounter = 10;
+                        player.sleepCounter = 99;
                         player.standing = false;
-                        player.sleepCounter = -1;
-                        player.bodyMode = Player.BodyModeIndex.Crawl;
-                        player.animation = Player.AnimationIndex.DownOnFours;
-                        player.forceSleepCounter = 210;
-                        player.wantToJump = 0;
-                        //player.stun = 100;
+                        player.flipDirection = 1;
+                        player.sleepCurlUp = 1f;
+                        player.controller = new Player.NullController();
+                        ((PlayerGraphics)player.graphicsModule).LookAtNothing();
                         break;
                     }
                 case Behaviour.standing:
@@ -181,6 +183,7 @@ public class PVSlugNPC : UpdatableAndDeletable
         room.abstractRoom.AddEntity(abstractSlug);
         abstractSlug.RealizeInRoom();
         UpdateColor();
+        OnBehaviourChange();
         if (whoami == SpecialNPC.artiBrothers) room.updateList.ForEach(x =>
         {
             if (x is PVSlugNPC npc
@@ -213,14 +216,15 @@ public class PVSlugNPC : UpdatableAndDeletable
             realAI.nap = false;
             realAI.behaviorType = PVEnums.NPCBehaviour.completelyStill;
             realAI.SetDestination(default);
-
             switch (behaviour)
             {
                 case Behaviour.sleeping:
                     {
                         realAI.nap = true;
-                        realAI.cat.bodyMode = Player.BodyModeIndex.Crawl;
-
+                        var p = realAI.cat;
+                        p.bodyMode = Player.BodyModeIndex.Crawl;
+                        p.animation = Player.AnimationIndex.DownOnFours;
+                        ((PlayerGraphics)p.graphicsModule).LookAtNothing();
                         break;
                     }
                 case Behaviour.standing:
@@ -254,10 +258,11 @@ public class PVSlugNPC : UpdatableAndDeletable
         if (rcam == default) return;
         var sLeaser = rcam.spriteLeasers.FirstOrDefault(x => x.drawableObject == abstractSlug.realizedCreature.graphicsModule);
         if (sLeaser == default) return;
-        for(ushort i = 0; i<sLeaser.sprites.Length; i++)
+        for (ushort i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if(Array.Exists(StaticStuff.playerColorableSpritesIndices, x => x == i)) sLeaser.sprites[i].color = color;
+            if (Array.Exists(StaticStuff.playerColorableSpritesIndices, x => x == i)) sLeaser.sprites[i].color = Color.green;
         }
+        sLeaser.sprites[StaticStuff.playerEyeColorIndex].color = Color.red;
     }
 
     static void assignHSL(Player.NPCStats stats, Color color)
@@ -287,6 +292,24 @@ public class PVSlugNPC : UpdatableAndDeletable
         WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.GetTilePosition(path[currentPathingIndex]), room.abstractRoom.index);
         currentPathingIndex = (short)((currentPathingIndex + 1) % path.Length);
         return destination;
+    }
+    static void ApplySaintSleeping(Player player, Vector2 pos)
+    {
+        player.sleepCounter = 99;
+        player.SuperHardSetPosition(pos);
+        var graph = (PlayerGraphics)player.graphicsModule;
+        var sleaser = player.room.game.cameras[0].spriteLeasers.FirstOrDefault(x => x.drawableObject == graph);
+        if(sleaser != null) sleaser.sprites[0].rotation = (player.bodyChunks[1].pos - player.bodyChunks[0].pos).GetAngle();
+        player.bodyChunks[1].pos.x = player.bodyChunks[1].lastPos.x = player.bodyChunks[1].lastLastPos.x = graph.drawPositions[1,0].x = graph.drawPositions[1,1].x = player.bodyChunks[0].pos.x + 30f;
+        graph.tail.Aggregate(0, (total, next) =>
+        {
+            next.pos.x = next.lastPos.x = player.bodyChunks[0].pos.x + total * 15f;
+            total++;
+            return total;
+        });
+        player.bodyChunks[1].pos.y = player.bodyChunks[1].lastPos.y = player.bodyChunks[1].lastLastPos.y = graph.drawPositions[1,0].y = graph.drawPositions[1,1].y = player.bodyChunks[0].pos.y;
+        player.bodyChunks[0].vel *= 0f;
+        player.bodyChunks[1].vel *= 0f;
     }
     public override void Destroy()
     {

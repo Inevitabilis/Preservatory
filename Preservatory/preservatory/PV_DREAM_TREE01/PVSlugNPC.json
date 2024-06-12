@@ -5,8 +5,8 @@
     "VersionId": "0.0.0",
     "Data": {
       "point": {
-        "x": 543.999939,
-        "y": 100.000008
+        "x": 550.999939,
+        "y": 130.0
       },
       "path": [
         {
@@ -45,7 +45,7 @@
         }
       ],
       "fullgrown": true,
-      "forcepos": false,
+      "forcepos": true,
       "whoami": 0,
       "behaviour": 0,
       "playerRelationship": 0.0

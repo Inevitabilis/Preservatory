@@ -86,20 +86,12 @@ public class Teleporter : UpdatableAndDeletable
             {
                 if (x.realizedCreature is Player p)
                 {
+                    p.bodyChunks[1].pos.x = p.bodyChunks[0].pos.x + 3f;
+                    p.bodyChunks[1].pos.y = p.bodyChunks[0].pos.y;
                     p.sleepCounter = 100;
                     p.sleepWhenStill = false;
                     p.bodyMode = Player.BodyModeIndex.Crawl;
                     p.animation = Player.AnimationIndex.DownOnFours;
-                }
-            });
-        }
-        else
-        {
-            room.game.AlivePlayers.ForEach(x =>
-            {
-                if (x.realizedCreature is Player p)
-                { 
-                    p.bodyMode = Player.BodyModeIndex.Stand;
                 }
             });
         }

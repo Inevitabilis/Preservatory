@@ -67,9 +67,10 @@ public static class StaticStuff
     public const int TicksPerSecond = 40;
     public const bool devBuild = true;
     public static short[] playerColorableSpritesIndices = [0,1,2,3,4,5,6,7,8];
+    public static short playerEyeColorIndex = 10;
 
     public static Vector2 centerOfOneScreenRoom = new(482, 349);
-    public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> creatures, World world, RainWorldGame game, Destination d)
+    public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> abstractCreatures, World world, RainWorldGame game, Destination d)
     {
         AbstractRoom room = world.GetAbstractRoom(d.roomName);
         room.RealizeRoom(world, game);
@@ -91,13 +92,13 @@ public static class StaticStuff
         }
         RWCustom.IntVector2 middleOfRoom = new(room.realizedRoom.TileWidth / 2 + 10, room.realizedRoom.TileHeight / 2);
         WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.realizedRoom.GetTilePosition(d.position), room.index);
-        creatures.ForEach(creature => creature.pos = destination);
-        creatures.ForEach(player =>
+        abstractCreatures.ForEach(creature => creature.pos = destination);
+        abstractCreatures.ForEach(absPlayer =>
         {
-            player.RealizeInRoom();
-            player.realizedCreature.mainBodyChunk.pos = d.position;
+            absPlayer.RealizeInRoom();
+            ((Player)absPlayer.realizedCreature).SuperHardSetPosition(d.position);
         });
-        room.world.game.roomRealizer.followCreature = creatures[0];
+        room.world.game.roomRealizer.followCreature = abstractCreatures[0];
         game.cameras[0].MoveCamera(room.realizedRoom, 0);
         game.cameras[0].virtualMicrophone.AllQuiet();
         game.cameras[0].virtualMicrophone.NewRoom(game.cameras[0].room);
