@@ -11,12 +11,17 @@ using PVStuffMod.Logic;
 using System.Linq;
 using PVStuff.Logic.ROM_objects;
 using PVStuff.Logic;
+using Newtonsoft.Json.Bson;
 
 namespace PVStuffMod;
 
 internal static class MainLogic
 {
     public static void Log(string message) => PVStuff.s_logger?.LogDebug(message);
+    public static void DebugLog(string message)
+    {
+        if(StaticStuff.devBuild) Log(message);
+    }
     public static List<IReceiveWorldTicks> globalUpdateReceivers;
     public static InternalSoundController internalSoundController;
     static bool initialized = false;
