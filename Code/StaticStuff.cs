@@ -97,6 +97,7 @@ public static class StaticStuff
         {
             absPlayer.RealizeInRoom();
             ((Player)absPlayer.realizedCreature).SuperHardSetPosition(d.position);
+            ((Player)absPlayer.realizedCreature).graphicsModule?.Reset();
         });
         room.world.game.roomRealizer.followCreature = abstractCreatures[0];
         game.cameras[0].MoveCamera(room.realizedRoom, 0);

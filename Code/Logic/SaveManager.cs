@@ -15,7 +15,12 @@ internal static class SaveManager
     private static HashSet<SlugcatStats.Name>[] save = [];
     internal static HashSet<SlugcatStats.Name>[] EscapismEnding
     {
-        get => save;
+        get
+        {
+            if (save.Length == 0) LoadData();
+            return save;
+        }
+
         private set => save = value;
     }
     private static string PreservatoryDirectory => ModManager.ActiveMods.Find(x => x.enabled && x.name == "Preservatory").path;
@@ -37,7 +42,6 @@ internal static class SaveManager
     }
     internal static bool TryGetValue(int saveStateNumber, SlugcatStats.Name name)
     {
-        if(EscapismEnding.Length == 0) LoadData();
         return EscapismEnding[saveStateNumber].Contains(name);
     }
     internal static void LoadData()
