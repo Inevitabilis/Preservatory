@@ -90,6 +90,7 @@ public class Teleporter : UpdatableAndDeletable
                     p.bodyChunks[1].pos.y = p.bodyChunks[0].pos.y;
                     p.sleepCounter = 100;
                     p.sleepWhenStill = false;
+                    p.standing = false;
                     p.bodyMode = Player.BodyModeIndex.Crawl;
                     p.animation = Player.AnimationIndex.DownOnFours;
                 }
