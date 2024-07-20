@@ -1,17 +1,12 @@
 ﻿using UnityEngine;
 using Menu;
 using static PVStuffMod.StaticStuff;
-using System;
 using System.Collections.Generic;
-using System.CodeDom;
 using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
-using System.IO;
 using PVStuffMod.Logic;
-using System.Linq;
 using PVStuff.Logic.ROM_objects;
 using PVStuff.Logic;
-using Newtonsoft.Json.Bson;
 
 namespace PVStuffMod;
 
@@ -32,6 +27,7 @@ internal static class MainLogic
     }
     static internal void Startup()
     {
+        
         if (initialized) return;
         //Scene related changes
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
@@ -51,7 +47,56 @@ internal static class MainLogic
         };
         RegisterROMObjects();
         SaveManager.ApplyHooks();
+        On.PathFinder.CheckConnectionCost += PathFinder_CheckConnectionCost;
+        //On.Player.Update += static (orig, self, eu) =>
+        //{
+        //    orig(self, eu);
+        //    Log($"Slugcat update, class: {self.SlugCatClass.ToString()}, chunk rads: {self.bodyChunks[0].rad} and {self.bodyChunks[1].rad}, the distance between them: {(self.bodyChunks[0].pos - self.bodyChunks[1].pos).magnitude} (positions are {self.bodyChunks[0].pos} and {self.bodyChunks[1].pos}");
+        //};
+
         initialized = true;
+    }
+#warning remove in the future
+    private static PathCost PathFinder_CheckConnectionCost(On.PathFinder.orig_CheckConnectionCost orig, PathFinder self, PathFinder.PathingCell start, PathFinder.PathingCell goal, MovementConnection connection, bool followingPath)
+    {
+        PathCost pathCost = new PathCost(100f * (float)connection.distance, PathCost.Legality.IllegalConnection);
+        Log($"self is {self}");
+        Log($"self.realizedRoom is {(self.realizedRoom == null ? "NULL" : self.realizedRoom)}");
+        Log($"aimap is {self.realizedRoom.aimap}");
+        if (!self.realizedRoom.aimap.IsConnectionAllowedForCreature(connection, self.creature.creatureTemplate))
+        {
+            pathCost += new PathCost(0f, PathCost.Legality.IllegalConnection);
+        }
+        else
+        {
+            PathCost pathCost2 = self.creatureType.ConnectionResistance(connection.type);
+            if (pathCost2.Considerable)
+            {
+                PathCost pathCost3 = self.CoordinateCost(goal.worldCoordinate);
+                if (pathCost3.Considerable && self.CoordinateCost(start.worldCoordinate).Considerable)
+                {
+                    pathCost2.resistance *= (float)connection.distance;
+                    pathCost = pathCost2 + pathCost3 + new PathCost(0f, self.CoordinateCost(start.worldCoordinate).legality);
+                }
+            }
+        }
+        if (start.worldCoordinate.room != goal.worldCoordinate.room)
+        {
+            pathCost += self.creatureType.ConnectionResistance(MovementConnection.MovementType.BetweenRooms);
+        }
+        else if (connection.type == MovementConnection.MovementType.NPCTransportation)
+        {
+            pathCost += self.creatureType.NPCTravelAversion;
+        }
+        else if (connection.type == MovementConnection.MovementType.ShortCut)
+        {
+            pathCost += self.creatureType.shortcutAversion;
+        }
+        if (pathCost.Considerable && self.InThisRealizedRoom(connection.destinationCoord) && self.InThisRealizedRoom(connection.startCoord))
+        {
+            pathCost = self.AI.TravelPreference(connection, pathCost);
+        }
+        return pathCost;
     }
 
     private static void GarbageCollector(List<IReceiveWorldTicks> list, RoomCamera[] cameras)

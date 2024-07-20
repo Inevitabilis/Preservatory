@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace PVStuff.Logic.ROM_objects;
 
-public class PVSlugNPC : UpdatableAndDeletable
+public class PVSlugNPC : UpdatableAndDeletable, INotifyWhenRoomIsReady
 {
     #region exposed variables
     public Vector2 point = new(500, 600);
@@ -108,12 +108,12 @@ public class PVSlugNPC : UpdatableAndDeletable
     [JsonIgnore]
     //for detecting behaviour change
     Behaviour lastBehaviour;
-    uint tickcounter = 0;
+    [JsonIgnore]
+    bool readyForAI;
     #endregion
     public override void Update(bool eu)
     {
-        tickcounter++;
-        if (!ShouldSpawnForThisSlugcat() || room.aimap == null) return;
+        if (!ShouldSpawnForThisSlugcat() || !readyForAI) return;
         if (abstractSlug == null) Initiate();
         if (StaticStuff.devBuild && Input.GetKey(KeyCode.V)) ResetSlug();
         ErrorHandling();
@@ -150,6 +150,7 @@ public class PVSlugNPC : UpdatableAndDeletable
                         if (Vector2.Distance(abstractSlug.realizedCreature.mainBodyChunk.pos, point) < 10f) realAI.SetDestination(GetNewDestination());
                         break;
                     }
+#warning will probably be deleted?
                 case Behaviour.followPlayer:
                     {
                         FollowingLogic(absAI, realAI);
@@ -184,11 +185,20 @@ public class PVSlugNPC : UpdatableAndDeletable
     public void Initiate()
     {
         if (!ShouldSpawnForThisSlugcat()) return;
+        var game = room.game;
         abstractSlug = new AbstractCreature(room.world,
-            StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC), null, room.ToWorldCoordinate(point), room.game.GetNewID());
+            StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC), null, room.ToWorldCoordinate(point), game.GetNewID());
         if (abstractSlug.state is PlayerState state) state.forceFullGrown = fullgrown;
+
+        abstractSlug.state = new PlayerNPCState(abstractSlug, 0);
+        Player player = new Player(abstractSlug, game.world);
+        player.npcCharacterStats = new SlugcatStats(SlugcatStats.Name.White, malnourished: false);
+        abstractSlug.abstractAI = new SlugNPCAbstractAI(game.world, abstractSlug);
+        abstractSlug.abstractAI.RealAI = new SlugNPCAI(abstractSlug, game.world);
         room.abstractRoom.AddEntity(abstractSlug);
+
         abstractSlug.RealizeInRoom();
+        //abstractSlug.abstractAI.RealAI.pathFinder.Reset(room);
         if (forcepos) ApplySaintSleeping(abstractSlug.realizedCreature as Player, point);
         UpdateColor();
         OnBehaviourChange();
@@ -312,7 +322,7 @@ public class PVSlugNPC : UpdatableAndDeletable
         if (abstractSlug != null)
         {
             Array.ForEach(room.game.cameras, cam => RemoveObject(cam.spriteLeasers, abstractSlug.realizedCreature.graphicsModule));
-            room.updateList.Remove(abstractSlug.realizedCreature);
+            room.RemoveObject(abstractSlug.realizedCreature);
             room.abstractRoom.RemoveEntity(abstractSlug);
         }
         base.Destroy();
@@ -323,6 +333,14 @@ public class PVSlugNPC : UpdatableAndDeletable
         {
             if (sleaser[i].drawableObject == obj) sleaser[i].CleanSpritesAndRemove();
         }
+    }
+
+    public void ShortcutsReady()
+    {}
+
+    public void AIMapReady()
+    {
+        readyForAI = true;
     }
     #endregion
 }

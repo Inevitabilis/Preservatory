@@ -1,0 +1,54 @@
+{
+  "RoomId": "PV_DREAM_TREE01",
+  "TypeId": "PVSlugNPC",
+  "DataJson": {
+    "VersionId": "0.0.0",
+    "Data": {
+      "point": {
+        "x": 335.999939,
+        "y": 86.00001
+      },
+      "path": [
+        {
+          "x": 500.0,
+          "y": 500.0
+        },
+        {
+          "x": 500.0,
+          "y": 600.0
+        },
+        {
+          "x": 600.0,
+          "y": 600.0
+        },
+        {
+          "x": 600.0,
+          "y": 500.0
+        }
+      ],
+      "FollowPlayerActiveZone": [
+        {
+          "x": 500.0,
+          "y": 500.0
+        },
+        {
+          "x": 500.0,
+          "y": 600.0
+        },
+        {
+          "x": 600.0,
+          "y": 600.0
+        },
+        {
+          "x": 600.0,
+          "y": 500.0
+        }
+      ],
+      "fullgrown": true,
+      "forcepos": false,
+      "whoami": 0,
+      "behaviour": 1,
+      "playerRelationship": 0.0
+    }
+  }
+}
