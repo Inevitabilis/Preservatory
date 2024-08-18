@@ -113,7 +113,7 @@ public class PVSlugNPC : UpdatableAndDeletable, INotifyWhenRoomIsReady
     #endregion
     public override void Update(bool eu)
     {
-        if (!ShouldSpawnForThisSlugcat() || !readyForAI) return;
+        if (!ShouldSpawnForThisSlugcat() || !room.fullyLoaded || !room.ReadyForPlayer) return;
         if (abstractSlug == null) Initiate();
         if (StaticStuff.devBuild && Input.GetKey(KeyCode.V)) ResetSlug();
         ErrorHandling();
@@ -192,13 +192,15 @@ public class PVSlugNPC : UpdatableAndDeletable, INotifyWhenRoomIsReady
 
         abstractSlug.state = new PlayerNPCState(abstractSlug, 0);
         Player player = new Player(abstractSlug, game.world);
-        player.npcCharacterStats = new SlugcatStats(SlugcatStats.Name.White, malnourished: false);
+        player.npcCharacterStats = new SlugcatStats(SlugcatStats.Name.Yellow, malnourished: false);
         abstractSlug.abstractAI = new SlugNPCAbstractAI(game.world, abstractSlug);
         abstractSlug.abstractAI.RealAI = new SlugNPCAI(abstractSlug, game.world);
+        abstractSlug.abstractAI.RealAI.lastRoom = default;
+        abstractSlug.abstractAI.RealAI.NewRoom(room);
         room.abstractRoom.AddEntity(abstractSlug);
 
         abstractSlug.RealizeInRoom();
-        //abstractSlug.abstractAI.RealAI.pathFinder.Reset(room);
+        abstractSlug.abstractAI.RealAI.pathFinder.Reset(room);
         if (forcepos) ApplySaintSleeping(abstractSlug.realizedCreature as Player, point);
         UpdateColor();
         OnBehaviourChange();

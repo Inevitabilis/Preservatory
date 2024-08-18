@@ -7,12 +7,15 @@ using ROM.RoomObjectService;
 using PVStuffMod.Logic;
 using PVStuff.Logic.ROM_objects;
 using PVStuff.Logic;
+using System.Diagnostics;
+using BepInEx.Logging;
 
 namespace PVStuffMod;
 
 internal static class MainLogic
 {
     public static void Log(string message) => PVStuff.s_logger?.LogDebug(message);
+    public static ManualLogSource logger => PVStuff.s_logger;
     public static void DebugLog(string message)
     {
         if(StaticStuff.devBuild) Log(message);
@@ -47,7 +50,8 @@ internal static class MainLogic
         };
         RegisterROMObjects();
         SaveManager.ApplyHooks();
-        On.PathFinder.CheckConnectionCost += PathFinder_CheckConnectionCost;
+        //On.PathFinder.CheckConnectionCost += PathFinder_CheckConnectionCost;
+        //On.PathFinder.Reset += PathFinder_Reset;
         //On.Player.Update += static (orig, self, eu) =>
         //{
         //    orig(self, eu);
@@ -56,13 +60,20 @@ internal static class MainLogic
 
         initialized = true;
     }
+
+    private static void PathFinder_Reset(On.PathFinder.orig_Reset orig, PathFinder self, Room newRealizedRoom)
+    {
+        if (newRealizedRoom is null) Log((new StackTrace()).ToString());
+        orig(self, newRealizedRoom);
+    }
 #warning remove in the future
     private static PathCost PathFinder_CheckConnectionCost(On.PathFinder.orig_CheckConnectionCost orig, PathFinder self, PathFinder.PathingCell start, PathFinder.PathingCell goal, MovementConnection connection, bool followingPath)
     {
         PathCost pathCost = new PathCost(100f * (float)connection.distance, PathCost.Legality.IllegalConnection);
-        Log($"self is {self}");
-        Log($"self.realizedRoom is {(self.realizedRoom == null ? "NULL" : self.realizedRoom)}");
-        Log($"aimap is {self.realizedRoom.aimap}");
+        Log($"self.realizedRoom is {(self.realizedRoom == null ? "NULL" : self.realizedRoom.abstractRoom.name)} for creature {self.AI.creature.realizedCreature} ");
+        if (self.AI.creature.realizedCreature is Player p) Log($"the class is {p.slugcatStats.name}");
+        Log($"aimap is {(self.realizedRoom?.aimap == null ? "NULL" : self.realizedRoom.aimap)}");
+        if(self.realizedRoom is null) return pathCost;
         if (!self.realizedRoom.aimap.IsConnectionAllowedForCreature(connection, self.creature.creatureTemplate))
         {
             pathCost += new PathCost(0f, PathCost.Legality.IllegalConnection);
@@ -124,6 +135,7 @@ internal static class MainLogic
         TypeOperator.RegisterType<RedIllnessOperator>();
         TypeOperator.RegisterType<HLLOperator>();
         TypeOperator.RegisterType<PVSlugNPCOperator>();
+        TypeOperator.RegisterType<NPC2Operator>();
         PVSlugNPC.ApplyHooks();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
