@@ -11,12 +11,12 @@ public class ControlInstruction
     public int HorizontalComponent => ((int)horizontalDirection) - 1;
     public int VerticalComponent => ((int)verticalDirection) - 1;
 
-    public bool jmp;
-    public bool thrw;
-    public bool pckp;
-
+    public bool jmp = false;
+    public bool thrw = false;
+    public bool pckp = false;
     HorizontalDirection horizontalDirection = HorizontalDirection.None;
     VerticalDirection verticalDirection = VerticalDirection.None;
+
     enum HorizontalDirection
     {
         Left = 0,
