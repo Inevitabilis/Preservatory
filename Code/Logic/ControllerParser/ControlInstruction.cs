@@ -49,6 +49,11 @@ public struct Span
 {
     public int start;
     public int end;
+    public Span(int start, int end)
+    {
+        this.start = start;
+        this.end = end;
+    }
 }
 public class SpannedControlInstruction : ControlInstruction
 {

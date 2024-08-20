@@ -1,33 +1,56 @@
-﻿using System;
+﻿using PVStuffMod;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace PVStuff.Logic.ControllerParser;
 
 internal class SlugController : Player.PlayerController
 {
-    class Immutable
+    #region init
+    public SlugController(string ID)
     {
-        public bool repeated = false;
-        public SpannedControlInstruction[] spannedControlInstructions = [];
-        public Dictionary<int, ControlInstruction> instantInstructions = new();
+        this.ID = ID;
+        this.loader = new(this, ID);
     }
+    public enum EndAction
+    {
+        Stand,
+        DeleteController,
+        Loop
+    }
+
+
+    private InstructionsLoader loader;
+    public int? tickLimit = null;
+    public string ID;
+    public EndAction endAction = EndAction.Stand;
+    public List<SpannedControlInstruction> spannedControlInstructions = [];
+    public Dictionary<int, ControlInstruction> instantInstructions = new();
+
+    #endregion
+
+
     int controllerTimer = 0;
     int spanInstrIndex = 0;
-    Immutable data;
 
     public override Player.InputPackage GetInput()
     {
+
+
         Player.InputPackage? output = null;
-        if(data.instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction))
+        if(instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction))
         {
             output = InstantInstruction.ToPackage();
         }
         else
         {
-            output = data.spannedControlInstructions[spanInstrIndex].ToPackage();
+            output = spannedControlInstructions[spanInstrIndex].ToPackage();
         }
         controllerTimer++;
         return output ?? new ControlInstruction().ToPackage();
