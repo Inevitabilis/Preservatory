@@ -14,16 +14,16 @@ public class ControlInstruction
     public bool jmp = false;
     public bool thrw = false;
     public bool pckp = false;
-    HorizontalDirection horizontalDirection = HorizontalDirection.None;
-    VerticalDirection verticalDirection = VerticalDirection.None;
+    public HorizontalDirection horizontalDirection = HorizontalDirection.None;
+    public VerticalDirection verticalDirection = VerticalDirection.None;
 
-    enum HorizontalDirection
+    public enum HorizontalDirection
     {
         Left = 0,
         None = 1,
         Right = 2
     }
-    enum VerticalDirection
+    public enum VerticalDirection
     {
         Down = 0,
         None = 1,
@@ -61,8 +61,6 @@ public class SpannedControlInstruction : ControlInstruction
     {
         this.span = span;
     }
-    Span span;
-    public bool PastEnd(int timer) => span.end <= timer;
-    public bool IsWithinTime(int timer) => span.start <= timer && timer <= span.end;
+    public Span span;
 }
 
