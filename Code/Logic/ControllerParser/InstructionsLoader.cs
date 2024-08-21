@@ -34,7 +34,7 @@ internal class InstructionsLoader
 
     //by design it is intended that these three parameters are available across the whole class, which eases logging and passing them into functions
     int lineindex = 0;
-    string[] filestrings;
+    string[] filestrings = [];
     ReadState state = ReadState.meta;
     private void ReadFromFile()
     {
