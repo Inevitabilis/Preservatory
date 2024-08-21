@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using UnityEngine;
 
 namespace PVStuff.Logic.ControllerParser;
 
@@ -17,6 +18,7 @@ internal class SlugController : Player.PlayerController
     {
         this.ID = ID;
         this.loader = new(this, ID);
+        tickLimit = instantInstructions.Keys.Aggregate(0, Mathf.Max);
     }
     public enum EndAction
     {
@@ -27,7 +29,7 @@ internal class SlugController : Player.PlayerController
 
 
     private InstructionsLoader loader;
-    public int? tickLimit = null;
+    public int tickLimit;
     public string ID;
     public EndAction endAction = EndAction.Stand;
     public List<SpannedControlInstruction> spannedControlInstructions = [];
@@ -75,8 +77,7 @@ internal class SlugController : Player.PlayerController
             }
             //implicitly logic goes here when the replacement isn't found
             //we check whether there's customly defined tick limit and if its logic is applicable to fill the lack of input with standing
-#warning todo: assign tick limit to be maximum of all instant instructions
-            if(tickLimit != null && controllerTimer < tickLimit)
+            if(controllerTimer < tickLimit)
             {
                 return new();
             }
