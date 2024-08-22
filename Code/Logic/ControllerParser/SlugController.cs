@@ -14,6 +14,17 @@ namespace PVStuff.Logic.ControllerParser;
 internal class SlugController : Player.PlayerController
 {
     #region init
+    public static void Hook()
+    {
+        On.Player.Update += Player_Update;
+    }
+
+    private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+    {
+        orig(self, eu);
+        if (self.controller is SlugController c && c.SlatedForDeletion) self.controller = null;
+    }
+
     public SlugController(string ID)
     {
         this.ID = ID;
@@ -26,14 +37,15 @@ internal class SlugController : Player.PlayerController
         DeleteController,
         Loop
     }
+    public bool SlatedForDeletion = false;
 
 
     private InstructionsLoader loader;
-    public int? tickLimit;
-    public string ID;
-    public EndAction endAction = EndAction.Stand;
-    public List<SpannedControlInstruction> spannedControlInstructions = [];
-    public Dictionary<int, ControlInstruction> instantInstructions = new();
+    internal int? tickLimit;
+    internal string ID;
+    internal EndAction endAction = EndAction.Stand;
+    internal List<SpannedControlInstruction> spannedControlInstructions = [];
+    internal Dictionary<int, ControlInstruction> instantInstructions = new();
 
     #endregion
 
@@ -95,8 +107,8 @@ internal class SlugController : Player.PlayerController
                     }
                 case EndAction.DeleteController:
                     {
-#warning todo controller deletion
-                        throw new NotImplementedException();
+                        SlatedForDeletion = true;
+                        return new();
                     }
                 default:
                     {
