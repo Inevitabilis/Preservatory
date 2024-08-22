@@ -13,7 +13,7 @@ internal class ControlledSlugcat : UpdatableAndDeletable
     public Vector2 startPosition;
 
 
-    AbstractCreature puppet;
+    AbstractCreature? puppet;
     Player puppetPlayer => puppet.realizedCreature as Player;
     WorldCoordinate blockPosition => room.ToWorldCoordinate(startPosition);
     bool initdone;
