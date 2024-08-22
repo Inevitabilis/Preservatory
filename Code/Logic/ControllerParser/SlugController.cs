@@ -18,7 +18,7 @@ internal class SlugController : Player.PlayerController
     {
         this.ID = ID;
         this.loader = new(this, ID);
-        tickLimit = instantInstructions.Keys.Aggregate(0, Mathf.Max);
+        tickLimit ??= instantInstructions.Keys.Aggregate(0, Mathf.Max);
     }
     public enum EndAction
     {
@@ -29,7 +29,7 @@ internal class SlugController : Player.PlayerController
 
 
     private InstructionsLoader loader;
-    public int tickLimit;
+    public int? tickLimit;
     public string ID;
     public EndAction endAction = EndAction.Stand;
     public List<SpannedControlInstruction> spannedControlInstructions = [];
