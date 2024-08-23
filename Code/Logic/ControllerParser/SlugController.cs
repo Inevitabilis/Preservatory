@@ -22,12 +22,21 @@ internal class SlugController : Player.PlayerController
             if (self.controller is SlugController c && c.SlatedForDeletion) self.controller = null;
         };
     }
+    void loginf(object e) => MainLogic.logger.LogInfo(e);
 
     public SlugController(string ID)
     {
         this.ID = ID;
         this.loader = new(this, ID);
+#warning as of currently ticklimit is only impactful towards instant functions: the ticklimit is unused until we ran out of span instructions
         tickLimit ??= instantInstructions.Keys.Aggregate(0, Mathf.Max);
+        loginf("SPANNED CONTROL INSTRUCTIONS");
+        spannedControlInstructions.ForEach(x => loginf(x));
+        loginf("INSTANT CONTROL INSTRUCTIONS");
+        foreach (var key in instantInstructions.Keys)
+        {
+            loginf($"{key} - {instantInstructions[key]}");
+        }
     }
     public enum EndAction
     {
@@ -53,21 +62,22 @@ internal class SlugController : Player.PlayerController
 
     public override Player.InputPackage GetInput()
     {
-        Player.InputPackage? output = null;
+        ControlInstruction? output = null;
         if(instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction))
         {
-            output = InstantInstruction.ToPackage();
+            output = InstantInstruction;
         }
-        else
+        else if(controllerTimer < tickLimit)
         {
-            HandleSpannedLogic();
+            output = HandleSpannedLogic();
         }
         controllerTimer++;
-        return output ?? new ControlInstruction().ToPackage();
+        loginf("controller update tick fired. returning " + output);
+        return (output ?? new ControlInstruction()).ToPackage();
 
     }
 
-    private ControlInstruction? HandleSpannedLogic()
+    private ControlInstruction HandleSpannedLogic()
     {
         //when the current instruction is valid, there's no need for any actions
         if(!InstructionReachedEnd)

@@ -9,7 +9,7 @@
         "y": 152.0
       },
       "controllerID": "test",
-      "isEnabled": false
+      "isEnabled": true
     }
   }
 }
