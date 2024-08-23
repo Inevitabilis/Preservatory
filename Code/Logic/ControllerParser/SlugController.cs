@@ -16,13 +16,11 @@ internal class SlugController : Player.PlayerController
     #region init
     public static void Hook()
     {
-        On.Player.Update += Player_Update;
-    }
-
-    private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-    {
-        orig(self, eu);
-        if (self.controller is SlugController c && c.SlatedForDeletion) self.controller = null;
+        On.Player.Update += static (orig, self, eu) =>
+        {
+            orig(self, eu);
+            if (self.controller is SlugController c && c.SlatedForDeletion) self.controller = null;
+        };
     }
 
     public SlugController(string ID)
