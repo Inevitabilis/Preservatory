@@ -1,0 +1,17 @@
+//by default is false
+looping: true
+//when the limit is not specified, end of program is when spanned instruction finishes, there's no instant instructions left and no valid spanned instruction to use
+instruction limit: 2000
+//stand, loop, terminate control
+end action: loop
+//i'll use # for separating between metadata and the commands block
+#
+//options of verticality: up, down
+//options of horizontality: left, right
+//if unspecified, no input
+0-200: right up jump throw pickup
+//i think for single frame actions i'll boost priority, so you can go for 0-1000 do background stuff and then make a sequence of other inputs
+205: jump
+200-400: left
+400: pickup
+//the execution halts as soon as

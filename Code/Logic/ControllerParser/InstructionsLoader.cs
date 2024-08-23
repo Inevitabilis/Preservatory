@@ -8,9 +8,9 @@ namespace PVStuff.Logic.ControllerParser;
 internal class InstructionsLoader
 {
     //preservatory specific path for scripts
-    static string FolderPath => string.Concat(ModManager.ActiveMods.FirstOrDefault(x => x.id == "preservatory").path, "scripts");
+    static string FolderPath => Path.Combine(ModManager.ActiveMods.FirstOrDefault(x => x.id == "preservatory").path, "scripts");
     //lookup scripts by ID
-    static string GetScriptFileName(string filename) => string.Concat(FolderPath, filename, ".txt");
+    static string GetScriptFileName(string filename) => Path.Combine(FolderPath, filename + ".txt");
     //shortcut to logging errors
     static void logerr(object e) => MainLogic.logger.LogError(e);
     //shortcut to logging errors WITH context of current execution, features filename, line and string where it failed, as well as allows additional context
@@ -41,7 +41,8 @@ internal class InstructionsLoader
         if(!File.Exists(GetScriptFileName(ID)))
         {
             //the default state of controller is no commands and standing still on reaching end, so we can just
-            logerr($"the slugcat script of filename {ID}.txt wasn't found in 'scripts' folder");
+            logerr($"the slugcat script of filename {ID}.txt wasn't found in 'scripts' folder\n" +
+                $"was looking for {GetScriptFileName(ID)}");
             return;
         }
         filestrings = File.ReadAllLines(GetScriptFileName(ID));

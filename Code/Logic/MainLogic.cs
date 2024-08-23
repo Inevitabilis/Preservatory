@@ -86,9 +86,10 @@ internal static class MainLogic
         TypeOperator.RegisterType<VatSceneOperator>();
         TypeOperator.RegisterType<RedIllnessOperator>();
         TypeOperator.RegisterType<HLLOperator>();
-        TypeOperator.RegisterType<PVSlugNPCOperator>();
-        TypeOperator.RegisterType<NPC2Operator>();
-        PVSlugNPC.ApplyHooks();
+        //TypeOperator.RegisterType<PVSlugNPCOperator>();
+        //TypeOperator.RegisterType<NPC2Operator>();
+        //PVSlugNPC.ApplyHooks();
+        TypeOperator.RegisterType<ControlledSlugcatOperator>();
     }
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {

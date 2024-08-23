@@ -1,0 +1,15 @@
+{
+  "RoomId": "PV_DREAM_TREE01",
+  "TypeId": "ControlledSlugcat",
+  "DataJson": {
+    "VersionId": "0.0.0",
+    "Data": {
+      "startPosition": {
+        "x": 424.0,
+        "y": 152.0
+      },
+      "controllerID": "test",
+      "isEnabled": false
+    }
+  }
+}
