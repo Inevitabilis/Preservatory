@@ -98,7 +98,7 @@ internal class InstructionsLoader
                 notifyOfError("the amount of ':' at the string wasn't 1");
                 return;
             }
-
+            arguments[1] = arguments[1].TrimStart(' ');
             if (arguments[0] == "end action")
             {
                 if (!TryParseAsEndAction(arguments[1], out SlugController.EndAction endAction))
@@ -188,8 +188,7 @@ internal class InstructionsLoader
             return;
         }
         Span span = new Span(start, end);
-
-        string[] arguments = parameters.Split(' ');
+        string[] arguments = parameters.TrimStart(' ').Split(' ');
         SpannedControlInstruction instruction = new(span);
         Array.ForEach(arguments, argument => TryApplyToInstruction(instruction, argument));
         owner.spannedControlInstructions.Add(instruction);
@@ -208,6 +207,10 @@ internal class InstructionsLoader
     {
         switch (argument)
         {
+            case "":
+                {
+                    break;
+                }
             case "left":
                 {
                     instruction.horizontalDirection = ControlInstruction.HorizontalDirection.Left;
@@ -249,7 +252,7 @@ internal class InstructionsLoader
                 }
             default:
                 {
-                    notifyOfError($"argument {argument} was not found within the list of valid inputs");
+                    notifyOfError($"argument '{argument}' was not found within the list of valid inputs");
                     break;
                 }
         }

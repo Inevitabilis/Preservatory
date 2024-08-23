@@ -1,5 +1,3 @@
-//by default is false
-looping: true
 //when the limit is not specified, end of program is when spanned instruction finishes, there's no instant instructions left and no valid spanned instruction to use
 instruction limit: 2000
 //stand, loop, terminate control
