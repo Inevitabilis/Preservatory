@@ -43,6 +43,15 @@ public class ControlInstruction
             crouchToggle: false);
     }
     public ControlInstruction() { }
+
+    public override string ToString()
+    {
+        return string.Concat(jmp ? "jmp " : "",
+            thrw ? "thrw " : "",
+            pckp ? "pckp " : "",
+            horizontalDirection != HorizontalDirection.None ? horizontalDirection + " " : "",
+            verticalDirection != VerticalDirection.None ? verticalDirection + " " : "");
+    }
 }
 
 public struct Span
@@ -62,5 +71,9 @@ public class SpannedControlInstruction : ControlInstruction
         this.span = span;
     }
     public Span span;
+    public override string ToString()
+    {
+        return span.start + "-" + span.end + ": " + base.ToString();
+    }
 }
 
