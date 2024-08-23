@@ -6,10 +6,14 @@ end action: loop
 #
 //options of verticality: up, down
 //options of horizontality: left, right
+//other options: jump/jmp; throw/thrw; pickup/pckup/pckp
+//order of options doesn't matter (but i think you'd want to keep the order similar for your own readability)
 //if unspecified, no input
-0-200: right up jump throw pickup
+0-40: right up
 //i think for single frame actions i'll boost priority, so you can go for 0-1000 do background stuff and then make a sequence of other inputs
-205: jump
-200-400: left
+41: jump left
+42: jump left
+43: jump left
+40-120: left
 400: pickup
 //the execution halts as soon as
