@@ -5,11 +5,18 @@
     "VersionId": "0.0.0",
     "Data": {
       "startPosition": {
-        "x": 424.0,
-        "y": 152.0
+        "x": 528.0,
+        "y": 155.0
       },
       "controllerID": "test",
-      "isEnabled": true
+      "adult": true,
+      "whoAmI": 0,
+      "isEnabled": false,
+      "serializableColor": {
+        "r": 0.2157724,
+        "g": 1.0,
+        "b": 0.224390283
+      }
     }
   }
 }

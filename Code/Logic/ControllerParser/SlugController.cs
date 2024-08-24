@@ -22,11 +22,11 @@ internal class SlugController : Player.PlayerController
 	public SlugController(string ID)
 	{
 		this.ID = ID;
+		this.loader = new(this, ID);
 		tickLimit = Mathf.Max(
 			instantInstructions.Keys.Aggregate(0, Mathf.Max),
 			spannedControlInstructions.Last().span.end
 			);
-		this.loader = new(this, ID);
 	}
 	public enum EndAction
 	{
@@ -55,7 +55,7 @@ internal class SlugController : Player.PlayerController
 	{
 		ControlInstruction output = GetCurrentInput();
 		controllerTimer++;
-		loginf($"controller tick {controllerTimer}. returning " + output);
+		//loginf($"controller tick {controllerTimer}. returning " + output);
 		return (output ?? new ControlInstruction()).ToPackage();
 	}
 
