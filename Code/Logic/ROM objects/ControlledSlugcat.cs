@@ -2,13 +2,11 @@
 using PVStuff.Logic.ControllerParser;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
-using PVStuffMod.Logic.ROM_objects;
 using ROM.RoomObjectService;
 using ROM.UserInteraction.InroomManagement;
 using ROM.UserInteraction.ObjectEditorElement;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using ROM.UserInteraction.ObjectEditorElement.Scrollbar;
 using MoreSlugcats;
 using PVStuffMod;
 
@@ -72,7 +70,7 @@ public class ControlledSlugcat : UpdatableAndDeletable
 	public override void Update(bool eu)
 	{
 		if(!(room.fullyLoaded && room.ReadyForPlayer && room.shortCutsReady && isEnabled)) return;
-		if(!initdone) CreatureSetup();
+		if(IsValidToSpawnForCharacter() && !initdone) CreatureSetup();
 	}
 
 	private void CreatureSetup()
@@ -98,6 +96,15 @@ public class ControlledSlugcat : UpdatableAndDeletable
 			
 		}
 		initdone = true;
+	}
+	bool IsValidToSpawnForCharacter()
+	{
+		var campaignCharacter = room.game.GetStorySession.characterStats.name;
+		if (whoAmI == WhoAmI.anyone) return true;
+		if (whoAmI == WhoAmI.gourmand) return campaignCharacter == SlugcatStats.Name.White || campaignCharacter == SlugcatStats.Name.Yellow;
+		if (whoAmI == WhoAmI.monk) return campaignCharacter == SlugcatStats.Name.White || campaignCharacter == MoreSlugcatsEnums.SlugcatStatsName.Gourmand;
+		if (whoAmI == WhoAmI.survivor) return campaignCharacter == SlugcatStats.Name.Yellow || campaignCharacter == MoreSlugcatsEnums.SlugcatStatsName.Gourmand;
+		return true;
 	}
 }
 
