@@ -1,7 +1,5 @@
 //stand, loop, terminate control
 end action: loop
-//i'll use # for separating between metadata and the commands block. it is necessary to have even if 
-#
 //options of verticality: up, down
 //options of horizontality: left, right
 //other options: jump/jmp; throw/thrw; pickup/pckup/pckp

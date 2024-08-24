@@ -14,7 +14,7 @@ internal class InstructionsLoader
     //shortcut to logging errors
     static void logerr(object e) => MainLogic.logger.LogError(e);
     //shortcut to logging errors WITH context of current execution, features filename, line and string where it failed, as well as allows additional context
-    void notifyOfError(object e) => logerr($"instruction loading error: reading from file: {ID}, line {lineindex + 1}\n{filestrings[lineindex]}\n, additional context: {e}");
+    void notifyOfError(object e) => logerr($"instruction loading error: reading from file: {ID}, line {lineindex + 1}\n{filestrings[lineindex]} \nadditional context: {e}");
 
     //the loader should know two things: what to load and where to dump parsed progress
     public InstructionsLoader(SlugController slugController, string ID)
@@ -50,7 +50,12 @@ internal class InstructionsLoader
         for (lineindex = 0; lineindex < filestrings.Length; lineindex++)
         {
             //the comments shall not be read
-            if (filestrings[lineindex].StartsWith("//")) continue;
+            if (filestrings[lineindex].StartsWith("//") || filestrings[lineindex].TrimStart(' ').Length == 0) continue;
+            if (int.TryParse(filestrings[lineindex][0].ToString(), out int _)) //finding a number in first symbol of the string means we are in instructions zone now
+            {
+                state = ReadState.commands;
+                continue;
+            }
             switch (state)
             {
                 case ReadState.meta:
@@ -78,17 +83,13 @@ internal class InstructionsLoader
     private void ParseMetaInstruction()
     {
         var str = filestrings[lineindex];
-        if (str.StartsWith("#"))
-        {
-            state = ReadState.commands;
-        }
-        else if (str.Contains(":"))
+        if (str.Contains(":"))
         {
             var arguments = str.Split(':');
 
             ApplyMeta(arguments);
         }
-        else notifyOfError("meta string didn't start with # and didn't contain ':'");
+        else notifyOfError("meta string didn't start with a number and didn't contain ':'");
 
 
         void ApplyMeta(string[] arguments)
