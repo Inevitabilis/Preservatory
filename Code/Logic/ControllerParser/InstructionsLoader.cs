@@ -108,15 +108,18 @@ internal class InstructionsLoader
                 }
                 owner.endAction = endAction;
             }
-            else if (arguments[0] == "instruction limit")
-            {
-                if (!int.TryParse(arguments[1], out int tickLimit))
-                {
-                    notifyOfError($"the argument \"{arguments[1]}\" isn't a valid int");
-                    return;
-                }
-                owner.tickLimit = tickLimit;
-            }
+
+            //the 
+
+            //else if (arguments[0] == "instruction limit")
+            //{
+            //    if (!int.TryParse(arguments[1], out int tickLimit))
+            //    {
+            //        notifyOfError($"the argument \"{arguments[1]}\" isn't a valid int");
+            //        return;
+            //    }
+            //    owner.tickLimit = tickLimit;
+            //}
             else notifyOfError($"unknown meta command");
         }
 
