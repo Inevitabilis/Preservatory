@@ -27,16 +27,11 @@ internal class SlugController : Player.PlayerController
     public SlugController(string ID)
     {
         this.ID = ID;
+        tickLimit = Mathf.Max(
+            instantInstructions.Keys.Aggregate(0, Mathf.Max),
+            spannedControlInstructions.Last().span.end
+            );
         this.loader = new(this, ID);
-#warning as of currently ticklimit is only impactful towards instant functions: the ticklimit is unused until we ran out of span instructions
-        tickLimit ??= instantInstructions.Keys.Aggregate(0, Mathf.Max);
-        loginf("SPANNED CONTROL INSTRUCTIONS");
-        spannedControlInstructions.ForEach(x => loginf(x));
-        loginf("INSTANT CONTROL INSTRUCTIONS");
-        foreach (var key in instantInstructions.Keys)
-        {
-            loginf($"{key} - {instantInstructions[key]}");
-        }
     }
     public enum EndAction
     {
@@ -48,7 +43,7 @@ internal class SlugController : Player.PlayerController
 
 
     private InstructionsLoader loader;
-    internal int? tickLimit;
+    internal int tickLimit;
     internal string ID;
     internal EndAction endAction = EndAction.Stand;
     internal List<SpannedControlInstruction> spannedControlInstructions = [];
@@ -60,16 +55,47 @@ internal class SlugController : Player.PlayerController
     int controllerTimer = 0;
     int spanInstrIndex = 0;
 
+    SpannedControlInstruction CurrentSpanInstruction => spannedControlInstructions[spanInstrIndex];
+
     public override Player.InputPackage GetInput()
     {
         ControlInstruction? output = null;
-        if(instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction))
+        if(instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction)) //instant instructions are first priority
         {
             output = InstantInstruction;
         }
-        else if(controllerTimer < tickLimit)
+        else
         {
-            output = HandleSpannedLogic();
+            if (instructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.invalid)
+            {
+                //if current instruction is invalid, we try to find next that can be used in the future or now
+                for (; spanInstrIndex < spannedControlInstructions.Count; spanInstrIndex++)
+                {
+                    if (instructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.ongoing
+                        || instructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.pending) break;
+                }
+            }
+
+            //if index didn't reach end, we found it
+            //and if it was never invalid in the first place, this works as normal
+            if(spanInstrIndex < spannedControlInstructions.Count)
+            {
+                //if next span instruction is in the future and currently it's not instant, slugcat stands
+                if (instructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.pending)
+                {
+                    output = new();
+                }
+                else if (instructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.ongoing)
+                { //and only now we get to do the normal logic "do thing if this is what you're currently doing"
+                    output = CurrentSpanInstruction;
+                }
+            }
+            else //if you looped through the rest of instructions and didn't find a valid one
+            {
+                output = new(); //this is a tradeoff. i suppose it could be done that looping immediately tries to find a new valid action,
+                                //but in that i risk catching an infinite loop
+                EndLogic();
+            }
         }
         controllerTimer++;
         loginf("controller update tick fired. returning " + output);
@@ -77,54 +103,42 @@ internal class SlugController : Player.PlayerController
 
     }
 
-    private ControlInstruction HandleSpannedLogic()
+    private void EndLogic()
     {
-        //when the current instruction is valid, there's no need for any actions
-        if(!InstructionReachedEnd)
+        switch (endAction)
         {
-            return spannedControlInstructions[spanInstrIndex];
-        }
-        else
-        {
-            //in other case, we are looking for the next instruction with valid timespan
-            for(int i = spanInstrIndex; i < spannedControlInstructions.Count; i++)
-            {
-                if(IsValidInstructionToUse(spannedControlInstructions[i]))
+
+            case EndAction.Loop:
                 {
-                    spanInstrIndex = i;
-                    return spannedControlInstructions[spanInstrIndex];
+                    spanInstrIndex = 0;
+                    break;
                 }
-            }
-            //implicitly logic goes here when the replacement isn't found
-            //we check whether there's customly defined tick limit and if its logic is applicable to fill the lack of input with standing
-            if(controllerTimer < tickLimit)
-            {
-                return new();
-            }
-            //by now function officially reached end. we treat it accordingly
-            switch(endAction)
-            {
-                case EndAction.Stand:
-                    {
-                        return new();
-                    }
-                case EndAction.Loop:
-                    {
-                        spanInstrIndex = 0;
-                        return spannedControlInstructions[spanInstrIndex];
-                    }
-                case EndAction.DeleteController:
-                    {
-                        SlatedForDeletion = true;
-                        return new();
-                    }
-                default:
-                    {
-                        return new();
-                    }
-            }
+            case EndAction.DeleteController:
+                {
+                    SlatedForDeletion = true;
+                    break;
+                }
+            case EndAction.Stand:
+            default:
+                {
+                    break;
+                }
         }
     }
-    bool InstructionReachedEnd => spannedControlInstructions[spanInstrIndex].span.end < controllerTimer;
-    bool IsValidInstructionToUse(SpannedControlInstruction spanInstr) => spanInstr.span.start <= controllerTimer && controllerTimer < spanInstr.span.end; 
+    enum SpanInstrState
+    {
+        pending = 1,
+        ongoing = 2,
+        invalid = 4
+    }
+    
+    SpanInstrState instructionInRelationToTimer(SpannedControlInstruction spanInstr)
+    {
+        //when the instruction hasn't started, it is queued
+        if (spanInstr.span.start > controllerTimer) return SpanInstrState.pending;
+        //when the instruction started and hasn't ended, it's ongoing
+        else if (spanInstr.span.start <= controllerTimer && controllerTimer < spanInstr.span.end) return SpanInstrState.ongoing;
+        //the rest of cases we'd want to discard from future uses. either it has been played already or it's invalid
+        else return SpanInstrState.invalid;
+    }
 }
