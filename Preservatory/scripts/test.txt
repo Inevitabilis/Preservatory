@@ -1,8 +1,6 @@
-//when the limit is not specified, end of program is when spanned instruction finishes, there's no instant instructions left and no valid spanned instruction to use
-instruction limit: 2000
 //stand, loop, terminate control
 end action: loop
-//i'll use # for separating between metadata and the commands block
+//i'll use # for separating between metadata and the commands block. it is necessary to have even if 
 #
 //options of verticality: up, down
 //options of horizontality: left, right
@@ -10,10 +8,14 @@ end action: loop
 //order of options doesn't matter (but i think you'd want to keep the order similar for your own readability)
 //if unspecified, no input
 0-40: right up
-//i think for single frame actions i'll boost priority, so you can go for 0-1000 do background stuff and then make a sequence of other inputs
+//single frame actions always take a priority over spanned ones. they also don't care where they are placed within instructions, they will always execute in time
 41: jump left
 42: jump left
 43: jump left
 40-120: left
+121-400:
+//the code parsing commands works as follows: a default command is created, then every argument is applied to change it
+//which means that if no argument is specified, the input is valid and says "do nothing"
 400: pickup
-//the execution halts as soon as
+//the script has final tick, which is maximum of [all instant action timestamps and the end of last spanned action]
+//upon reaching it, end action is requested
