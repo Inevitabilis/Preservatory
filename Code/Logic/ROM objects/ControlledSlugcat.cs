@@ -91,7 +91,6 @@ public class ControlledSlugcat : UpdatableAndDeletable
 		stats.L = HSL.z;
 		if(puppetPlayer.graphicsModule is PlayerGraphics g)
 		{
-			MainLogic.logger.LogInfo("applying palette");
 			g.darkenFactor = 0.01f;
 			
 		}
