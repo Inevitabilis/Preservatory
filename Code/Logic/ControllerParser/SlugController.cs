@@ -67,7 +67,7 @@ internal class SlugController : Player.PlayerController
             return InstantInstruction;
         }
         #region find next valid instruction if current has ended
-        while (InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.invalid && spanInstrIndex < spannedControlInstructions.Count) //if current instruction doesn't fit, find next
+        while (spanInstrIndex < spannedControlInstructions.Count && InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.invalid) //if current instruction doesn't fit, find next
 		{
 			spanInstrIndex++;
 		}
