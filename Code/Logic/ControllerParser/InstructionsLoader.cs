@@ -54,7 +54,6 @@ internal class InstructionsLoader
             if (int.TryParse(filestrings[lineindex][0].ToString(), out int _)) //finding a number in first symbol of the string means we are in instructions zone now
             {
                 state = ReadState.commands;
-                continue;
             }
             switch (state)
             {
