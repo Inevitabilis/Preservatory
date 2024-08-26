@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static PVStuffMod.StaticStuff;
 
 namespace PVStuff.Logic.ControllerParser;
 
@@ -16,8 +17,6 @@ internal class SlugController : Player.PlayerController
 			if (self.controller is SlugController c && c.SlatedForDeletion) self.controller = null;
 		};
 	}
-	void loginf(object e) => MainLogic.logger.LogInfo(e);
-	void logerr(object e) => MainLogic.logger.LogError(e);
 
 	public SlugController(string ID)
 	{
