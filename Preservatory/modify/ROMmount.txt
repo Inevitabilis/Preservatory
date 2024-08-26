@@ -6,6 +6,5 @@
 [ADD]PV_END_RED\HLL.json
 [ADD]PV_DREAM_RED\RedInducedIllness.json
 [ADD]PV_END\VatScene.json
-[ADD]PV_DREAM_TREE01\PVSlugNPC.json
-[ADD]PV_DREAM_TREE01\PVSlugNPC2.json
-[ADD]PV_DREAM_TREE01\PVSlugNPC3.json
+[ADD]PV_A03\NPC2.json
+[ADD]PV_DREAM_TREE01\ControlledSlugcat.json

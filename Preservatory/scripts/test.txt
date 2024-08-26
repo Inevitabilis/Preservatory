@@ -1,0 +1,36 @@
+//options: stand, loop, terminate control, defaults to standing (as in no input)
+end action: loop
+
+//now supports blank spaces too!
+
+//the way parser recognizes meta part has ended (the one that treats "end action" and other stuff) is by checking whether first symbol is a number
+
+//any errors related to reading from file or executing controller are in Rain World\BepInEx\LogOutput.log
+
+//options of verticality: up, down
+//options of horizontality: left, right
+//other options: jump/jmp; throw/thrw; pickup/pckup/pckp
+
+//order of options doesn't matter (but i think you'd want to keep the order similar for your own readability)
+
+//if operation for the tick is unspecified, no input
+
+0-40: right up
+
+//single frame actions always take a priority over spanned ones. they also don't care where they are placed within instructions, they will always execute in time
+41: jump left
+42: jump left
+43: jump left
+40-120: left
+100-200: right
+//spanned instructions overlapping are treated trivially due to the way controller works
+//it will always use current span instruction until it's invalid, then look for the next span instruction that can be used now or in the future
+//their order is the same as you write here. so in this instance ticks 41,42,43 will be dedicated to instants, ticks 44-120 - to left, and 121 to 200 - to right
+//and also the following instruction will then result in only 201-400 being action
+121-400:
+//the code parsing commands works as follows: a default command is created, then every argument is applied to change it
+//which means that if no argument is specified, the input is valid and says "do nothing"
+400-405: jump
+//the script has final tick, which is maximum of [all instant action timestamps and the end of last spanned action]
+//so even if all spanned action ended, it will wait until all instant actions were done
+//upon reaching final tick, end action is requested

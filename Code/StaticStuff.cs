@@ -69,6 +69,9 @@ public static class StaticStuff
     public static short[] playerColorableSpritesIndices = [0,1,2,3,4,5,6,7,8];
     public static short playerEyeColorIndex = 10;
 
+    public static void loginf(object e) => MainLogic.logger.LogInfo(e);
+    public static void logerr(object e) => MainLogic.logger.LogError(e);
+
     public static Vector2 centerOfOneScreenRoom = new(482, 349);
     public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> abstractCreatures, World world, RainWorldGame game, Destination d)
     {
