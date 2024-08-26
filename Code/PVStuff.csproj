@@ -5,6 +5,9 @@
 	<Company>M4rbleL1ne</Company>
 	<Nullable>enable</Nullable>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);USEPOM</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Logic\TheEgg.cs" />
   </ItemGroup>

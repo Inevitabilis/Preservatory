@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
-using static PVStuffMod.StaticStuff;
+using static Pom.Pom;
 using static PVStuffMod.MainLogic;
 
-namespace PVStuffMod.Logic.ROM_objects;
+namespace PVStuffMod.Logic.POM_objects;
 /// <summary>
 /// ROM can only work with room specific objects as of now, so to prevent it from disappearing the exposed objects are different
 /// </summary>
@@ -57,10 +57,10 @@ public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
     void VolumeSlidersLogic()
     {
         if (disembodiedLoopEmitters == null) return;
-        
+
         for (short i = 0; i < disembodiedLoopEmitters.Length; i++)
         {
-            disembodiedLoopEmitters[i].volume = Mathf.Lerp(disembodiedLoopEmitters[i].volume, (controllerReference ?? new()).volumeSliders[i], 0.1f);
+            disembodiedLoopEmitters[i].volume = Mathf.Lerp(disembodiedLoopEmitters[i].volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
         }
     }
     static void PlayRoomlessDisembodiedLoop(VirtualMicrophone mic, SoundID? soundId, DisembodiedLoopEmitter emitter, float pan, float vol, float pitch)
@@ -98,31 +98,55 @@ public class ExposedSoundController : UpdatableAndDeletable
 {
     #region fields
     //ROM fields
-    public Vector2[] Polygon { get; set; } =
-        {
-            new Vector2(500, 500),
-            new Vector2(500, 600),
-            new Vector2(600, 600),
-            new Vector2(600, 500)
-        };
-    public float[] volumeSliders = new float[4];
-    public float linger = 0;
+
+    public static void RegisterObject()
+    {
+        RegisterFullyManagedObjectType(managedFields, typeof(ExposedSoundController), "PVSoundController");
+    }
+
+    //ROM fields
+    internal static ManagedField[] managedFields = [
+        new FloatField("linger", 0, float.PositiveInfinity, 0f, control: ManagedFieldWithPanel.ControlType.text),
+        new FloatField("Melody 1", 0, 1f, 0f),
+        new FloatField("Melody 2", 0, 1f, 0f),
+        new FloatField("Melody 3", 0, 1f, 0f),
+        new FloatField("Melody 4", 0, 1f, 0f),
+        POMUtils.defaultVectorField
+    ];
+
+    public Vector2[]? Polygon => POMUtils.AddRealPosition(data.GetValue<Vector2[]>("trigger zone"), pObj.pos);
+    public float[] volumeSliders => [
+        data.GetValue<float>("Melody 1"), 
+        data.GetValue<float>("Melody 2"), 
+        data.GetValue<float>("Melody 3"), 
+        data.GetValue<float>("Melody 4")];
+    public float linger => data.GetValue<float>("linger");
 
     private const float RandomOffsetOnCreationMultiplier = 100f;
     private int lingerTimer;
+
+    ManagedData data;
+    PlacedObject pObj;
     #endregion
 
     #region methods
+    public ExposedSoundController(Room room, PlacedObject pObj)
+    {
+        this.pObj = pObj;
+        data = (pObj.data as ManagedData)!;
+    }
+
     public override void Update(bool eu)
     {
         base.Update(eu);
 
         UpdateSoundController();
-#if !USEPOM
+
+#if USEPOM
         if (lingerTimer > 0) lingerTimer--;
         else if (internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
-        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom 
-        && abstractCreature.realizedCreature != null 
+        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom
+        && abstractCreature.realizedCreature != null
         && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
         {
             internalSoundController.controllerReference = this;
@@ -136,65 +160,7 @@ public class ExposedSoundController : UpdatableAndDeletable
     }
 
 
-    #endregion
-}
-
-public class ExposedSoundControllerOperator : TypeOperator<ExposedSoundController>
-{
-    private static VersionedLoader<ExposedSoundController> VersionedLoader { get; } =
-            TypeOperatorUtils.CreateVersionedLoader<ExposedSoundController>(defaultLoad: TypeOperatorUtils.TrivialLoad<ExposedSoundController>);
-
-    public override string TypeId => nameof(ExposedSoundController);
-
-    public override ExposedSoundController CreateNew(Room room, Rect currentScreenRect)
-    {
-        Vector2 center = currentScreenRect.center;
-
-        float screenWidth = currentScreenRect.width;
-        float screenHeight = currentScreenRect.height;
-
-        Vector2[] polygon = {
-                center + new Vector2(screenWidth/8, screenHeight/8),
-                center + new Vector2(screenWidth/8, - screenHeight/8),
-                center + new Vector2(-screenWidth/8, -screenHeight/8),
-                center + new Vector2(-screenWidth/8, screenHeight/8)
-            };
-        return new()
-        {
-            room = room,
-            Polygon = polygon
-        };
-    }
-    public override ExposedSoundController Load(JToken dataJson, Room room)
-    {
-        return VersionedLoader.Load(dataJson, room);
-    }
-
-    public override JToken Save(ExposedSoundController obj)
-    {
-        return TypeOperatorUtils.GetTrivialVersionedSaveCall<ExposedSoundController>("0.0.0").Invoke(obj);
-    }
-
-    public override void AddToRoom(ExposedSoundController obj, Room room)
-    {
-        room.AddObject(obj);
-    }
-
-    public override void RemoveFromRoom(ExposedSoundController obj, Room room)
-    {
-        room.RemoveObject(obj);
-    }
-
-    public override IEnumerable<IObjectEditorElement> GetEditorElements(ExposedSoundController obj, Room room)
-    {
-        yield return Elements.Polygon("Trigger Zone", obj.Polygon);
-        new ScrollbarConfiguration<float>(0f, 1f, x => x, x => x, x => x.ToString("0.##", CultureInfo.InvariantCulture));
-        yield return Elements.Scrollbar("Melody 0", getter: () => obj.volumeSliders[0], setter: value => obj.volumeSliders[0] = value);
-        yield return Elements.Scrollbar("Melody 1", getter: () => obj.volumeSliders[1], setter: value => obj.volumeSliders[1] = value);
-        yield return Elements.Scrollbar("Melody 2", getter: () => obj.volumeSliders[2], setter: value => obj.volumeSliders[2] = value);
-        yield return Elements.Scrollbar("Melody 3", getter: () => obj.volumeSliders[3], setter: value => obj.volumeSliders[3] = value);
-        yield return Elements.TextField("Lingering", getter: () => obj.linger, setter: x => obj.linger = x);
-    }
+#endregion
 }
 
 public class RoomlessDisembodiedLoop : VirtualMicrophone.SoundObject

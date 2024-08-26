@@ -226,6 +226,37 @@ public static class ROMUtils
         return isAboveLine;
     }
 }
+
+public static class POMUtils
+{
+    public static Vector2[]? AddRealPosition(Vector2[]? Polygon, Vector2 pos)
+    {
+        if (Polygon == null) return null;
+        Vector2[] result = new Vector2[Polygon.Length];
+        for (int i = 0; i < Polygon.Length; i++)
+        { result[i] = Polygon[i] + pos; }
+        return result;
+    }
+
+    public static bool PositionWithinPoly(Vector2[]? Polygon, Vector2 point)
+    {
+        if (Polygon == null) return false;
+        bool result = true;
+        for (int i = 0; i < Polygon.Length; i++)
+        {
+            if (IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point)
+                != IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], Polygon[(i + 2) % Polygon.Length])) result = false;
+        }
+        return result;
+    }
+    private static bool IsAboveEquationByTwoPoints(Vector2 point1, Vector2 point2, Vector2 v)
+    {
+        bool isAboveLine = (point1.x - v.x) * (point2.y - point1.y) <= (point1.y - v.y) * (point2.x - point1.x);
+        return isAboveLine;
+    }
+
+    public static Pom.Pom.Vector2ArrayField defaultVectorField => new Pom.Pom.Vector2ArrayField("trigger zone", 4, true, Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType.Polygon, Vector2.zero, Vector2.right* 20f, (Vector2.right + Vector2.up) * 20f, Vector2.up* 20f);
+}
 public interface IReceiveWorldTicks
 {
     public void Update();

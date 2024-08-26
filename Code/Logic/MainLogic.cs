@@ -1,12 +1,24 @@
 ﻿using UnityEngine;
 using Menu;
 using static PVStuffMod.StaticStuff;
+using System;
 using System.Collections.Generic;
-using PVStuffMod.Logic.ROM_objects;
-using ROM.RoomObjectService;
+using System.CodeDom;
+//using PVStuffMod.Logic.ROM_objects;
+using System.IO;
 using PVStuffMod.Logic;
-using PVStuff.Logic.ROM_objects;
+using System.Linq;
+//using PVStuff.Logic.ROM_objects;
 using PVStuff.Logic;
+
+#if USEPOM
+using PVStuffMod.Logic.POM_objects;
+#else
+using PVStuffMod.Logic.ROM_objects;
+using PVStuff.Logic.ROM_objects;
+using ROM.RoomObjectService;
+using Newtonsoft.Json.Bson;
+#endif
 
 namespace PVStuffMod;
 
@@ -27,7 +39,6 @@ internal static class MainLogic
     }
     static internal void Startup()
     {
-        
         if (initialized) return;
         //Scene related changes
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
@@ -45,15 +56,13 @@ internal static class MainLogic
             globalUpdateReceivers.ForEach(x => x.Update());
             if (Input.GetKey(KeyCode.Backspace)) StaticStuff.logging = true;
         };
+#if USEPOM
+        RegisterPOMObjects();
+#else
         RegisterROMObjects();
+#endif
         SaveManager.ApplyHooks();
         On.PathFinder.CheckConnectionCost += PathFinder_CheckConnectionCost;
-        //On.Player.Update += static (orig, self, eu) =>
-        //{
-        //    orig(self, eu);
-        //    Log($"Slugcat update, class: {self.SlugCatClass.ToString()}, chunk rads: {self.bodyChunks[0].rad} and {self.bodyChunks[1].rad}, the distance between them: {(self.bodyChunks[0].pos - self.bodyChunks[1].pos).magnitude} (positions are {self.bodyChunks[0].pos} and {self.bodyChunks[1].pos}");
-        //};
-
         initialized = true;
     }
 #warning remove in the future
@@ -116,6 +125,18 @@ internal static class MainLogic
             }
         }
     }
+#if USEPOM
+    static internal void RegisterPOMObjects()
+    {
+        HLL.RegisterObject();
+        RedInducedIllness.RegisterObject();
+        Teleporter.RegisterObject();
+        VatScene.RegisterEffect();
+        ExposedSoundController.RegisterObject();
+        PVSlugNPC.RegisterObjects();
+        PVSlugNPC.ApplyHooks();
+        }
+#else
     static internal void RegisterROMObjects()
     {
         TypeOperator.RegisterType<ExposedSoundControllerOperator>();
@@ -126,6 +147,7 @@ internal static class MainLogic
         TypeOperator.RegisterType<PVSlugNPCOperator>();
         PVSlugNPC.ApplyHooks();
     }
+#endif
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
         if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot,self.sceneID.GetCharacterFromSelectScene())))
