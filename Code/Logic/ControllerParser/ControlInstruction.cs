@@ -36,6 +36,14 @@ public class ControlInstruction
             mp: false,
             crouchToggle: false);
     }
+    public ControlInstruction(Player.InputPackage package)
+    {
+        jmp = package.jmp;
+        thrw = package.thrw;
+        pckp = package.pckp;
+        horizontalDirection = (HorizontalDirection)(package.x + 1);
+        verticalDirection = (VerticalDirection)(package.y + 1);
+    }
     public ControlInstruction() { }
 
     public override string ToString()
