@@ -1,5 +1,5 @@
-//options: stand, loop, terminate control, defaults to standing (as in no input)
-end action: loop
+//options: 'stand' (no further input), 'loop' (repeat from start), 'terminate control' (delete controller from slugcat), 'hold last key' (repeats last key), defaults to 'stand' when unspecified
+end action: hold last key
 
 //now supports blank spaces too!
 
@@ -27,10 +27,11 @@ end action: loop
 //it will always use current span instruction until it's invalid, then look for the next span instruction that can be used now or in the future
 //their order is the same as you write here. so in this instance ticks 41,42,43 will be dedicated to instants, ticks 44-120 - to left, and 121 to 200 - to right
 //and also the following instruction will then result in only 201-400 being action
-121-400:
+121-200:
 //the code parsing commands works as follows: a default command is created, then every argument is applied to change it
 //which means that if no argument is specified, the input is valid and says "do nothing"
-400-405: jump
+200-205: jump
+206: down
 //the script has final tick, which is maximum of [all instant action timestamps and the end of last spanned action]
 //so even if all spanned action ended, it will wait until all instant actions were done
 //upon reaching final tick, end action is requested
