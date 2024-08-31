@@ -24,7 +24,7 @@ internal class SlugController : Player.PlayerController
 		this.loader = new(this, ID);
 		tickLimit = Mathf.Max(
 			instantInstructions.Keys.Aggregate(0, Mathf.Max),
-			spannedControlInstructions.Last().span.end
+			spannedControlInstructions.Count > 0 ? spannedControlInstructions.Last().span.end : 0
 			);
 	}
 	public enum EndAction
