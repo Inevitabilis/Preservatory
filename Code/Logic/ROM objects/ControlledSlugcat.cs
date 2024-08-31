@@ -27,7 +27,6 @@ public class ControlledSlugcat : UpdatableAndDeletable
 			return serializableColor.ToColor();
 		}
 	}
-#warning unused yet
 	public WhoAmI whoAmI = WhoAmI.anyone;
 	public bool isEnabled;
 
@@ -61,7 +60,15 @@ public class ControlledSlugcat : UpdatableAndDeletable
 	[JsonIgnore]
 	AbstractCreature? puppet;
 	[JsonIgnore]
-	Player puppetPlayer => puppet.realizedCreature as Player;
+	Player puppetPlayer
+	{
+		get
+		{
+			if (puppet?.realizedCreature is Player p) return p;
+			else if (puppet is null) throw new System.Exception($"[PRESERVATORY]: {nameof(ControlledSlugcat)}.{nameof(ControlledSlugcat.puppetPlayer)} - puppet was null");
+			else throw new System.Exception($"[PRESERVATORY]: {nameof(ControlledSlugcat)}.{nameof(ControlledSlugcat.puppetPlayer)} - realized creature of puppet was not player");
+		}
+	}
 	[JsonIgnore]
 	WorldCoordinate blockPosition => room.ToWorldCoordinate(startPosition);
 	[JsonIgnore]
@@ -91,8 +98,9 @@ public class ControlledSlugcat : UpdatableAndDeletable
 		stats.L = HSL.z;
 		if(puppetPlayer.graphicsModule is PlayerGraphics g)
 		{
+			//i haven't figured out how to paint slugNPCs properly in update, but there were two methods that handled it
+			//both conditional. one required darkenFactor to be above zero so here we are
 			g.darkenFactor = 0.01f;
-			
 		}
 		initdone = true;
 	}

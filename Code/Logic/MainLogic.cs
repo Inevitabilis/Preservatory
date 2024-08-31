@@ -10,6 +10,10 @@ using PVStuffMod.Logic;
 using System.Linq;
 //using PVStuff.Logic.ROM_objects;
 using PVStuff.Logic;
+using PVStuff.Logic.POM_objects;
+using BepInEx.Logging;
+
+
 
 #if USEPOM
 using PVStuffMod.Logic.POM_objects;
@@ -24,11 +28,7 @@ namespace PVStuffMod;
 
 internal static class MainLogic
 {
-    public static void Log(string message) => PVStuff.s_logger?.LogDebug(message);
-    public static void DebugLog(string message)
-    {
-        if(StaticStuff.devBuild) Log(message);
-    }
+    public static ManualLogSource logger => PVStuff.s_logger;
     public static List<IReceiveWorldTicks> globalUpdateReceivers;
     public static InternalSoundController internalSoundController;
     static bool initialized = false;
@@ -62,50 +62,7 @@ internal static class MainLogic
         RegisterROMObjects();
 #endif
         SaveManager.ApplyHooks();
-        On.PathFinder.CheckConnectionCost += PathFinder_CheckConnectionCost;
         initialized = true;
-    }
-#warning remove in the future
-    private static PathCost PathFinder_CheckConnectionCost(On.PathFinder.orig_CheckConnectionCost orig, PathFinder self, PathFinder.PathingCell start, PathFinder.PathingCell goal, MovementConnection connection, bool followingPath)
-    {
-        PathCost pathCost = new PathCost(100f * (float)connection.distance, PathCost.Legality.IllegalConnection);
-        Log($"self is {self}");
-        Log($"self.realizedRoom is {(self.realizedRoom == null ? "NULL" : self.realizedRoom)}");
-        Log($"aimap is {self.realizedRoom.aimap}");
-        if (!self.realizedRoom.aimap.IsConnectionAllowedForCreature(connection, self.creature.creatureTemplate))
-        {
-            pathCost += new PathCost(0f, PathCost.Legality.IllegalConnection);
-        }
-        else
-        {
-            PathCost pathCost2 = self.creatureType.ConnectionResistance(connection.type);
-            if (pathCost2.Considerable)
-            {
-                PathCost pathCost3 = self.CoordinateCost(goal.worldCoordinate);
-                if (pathCost3.Considerable && self.CoordinateCost(start.worldCoordinate).Considerable)
-                {
-                    pathCost2.resistance *= (float)connection.distance;
-                    pathCost = pathCost2 + pathCost3 + new PathCost(0f, self.CoordinateCost(start.worldCoordinate).legality);
-                }
-            }
-        }
-        if (start.worldCoordinate.room != goal.worldCoordinate.room)
-        {
-            pathCost += self.creatureType.ConnectionResistance(MovementConnection.MovementType.BetweenRooms);
-        }
-        else if (connection.type == MovementConnection.MovementType.NPCTransportation)
-        {
-            pathCost += self.creatureType.NPCTravelAversion;
-        }
-        else if (connection.type == MovementConnection.MovementType.ShortCut)
-        {
-            pathCost += self.creatureType.shortcutAversion;
-        }
-        if (pathCost.Considerable && self.InThisRealizedRoom(connection.destinationCoord) && self.InThisRealizedRoom(connection.startCoord))
-        {
-            pathCost = self.AI.TravelPreference(connection, pathCost);
-        }
-        return pathCost;
     }
 
     private static void GarbageCollector(List<IReceiveWorldTicks> list, RoomCamera[] cameras)
@@ -133,8 +90,7 @@ internal static class MainLogic
         Teleporter.RegisterObject();
         VatScene.RegisterEffect();
         ExposedSoundController.RegisterObject();
-        PVSlugNPC.RegisterObjects();
-        PVSlugNPC.ApplyHooks();
+        ControlledSlugcat.Register();
         }
 #else
     static internal void RegisterROMObjects()

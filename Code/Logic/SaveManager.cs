@@ -64,7 +64,6 @@ internal static class SaveManager
     }
     private static void TryLoadSaveFromDisk()
     {
-        MainLogic.Log("trying to load: " + FullPath);
         object? data = Newtonsoft.Json.JsonConvert.DeserializeObject<string[][]>(File.ReadAllText(FullPath));
         if(data is string[][] strings)
         {
@@ -72,7 +71,6 @@ internal static class SaveManager
         }
         else
         {
-            MainLogic.Log("No savefile for preservatory found");
             CreateSave();
         }
     }

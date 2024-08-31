@@ -48,7 +48,7 @@ public class HLL : UpdatableAndDeletable
 
     public override void Destroy()
     {
-        daddy.Destroy();
+        daddy?.Destroy();
     }
 
     public PlacedObject pObj;
