@@ -3,7 +3,10 @@ using static Pom.Pom;
 using UnityEngine;
 using Newtonsoft.Json;
 using MoreSlugcats;
-
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using System;
+using PVStuffMod;
 
 namespace PVStuff.Logic.POM_objects;
 
@@ -11,7 +14,9 @@ public class ControlledSlugcat : UpdatableAndDeletable
 {
     public static void Register()
     {
-        RegisterFullyManagedObjectType(fields, typeof(ControlledSlugcat), "Controlled slugcat");
+        RegisterFullyManagedObjectType(fields, typeof(ControlledSlugcat), "Controlled slugcat", StaticStuff.PreservatoryPOMCategory);
+        //Player.SleepUpdate explicitly requests actual player input to do sleep processing. fucked up and evil.
+        NPCHooks.Hook();
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -138,5 +143,64 @@ public class ControlledSlugcat : UpdatableAndDeletable
         if (whoAmI == WhoAmI.monk) return campaignCharacter == SlugcatStats.Name.White || campaignCharacter == MoreSlugcatsEnums.SlugcatStatsName.Gourmand;
         if (whoAmI == WhoAmI.survivor) return campaignCharacter == SlugcatStats.Name.Yellow || campaignCharacter == MoreSlugcatsEnums.SlugcatStatsName.Gourmand;
         return true;
+    }
+}
+
+internal static class NPCHooks
+{
+    public static void Hook()
+    {
+        IL.Player.SleepUpdate += Player_SleepUpdate;
+        On.Player.SleepUpdate += Player_SleepUpdate1;
+    }
+
+    private static void Player_SleepUpdate1(On.Player.orig_SleepUpdate orig, Player self)
+    {
+        orig(self);
+        if (!self.standing && self.input[0].y < 0 && !self.input[0].jmp && !self.input[0].thrw && !self.input[0].pckp && self.IsTileSolid(1, 0, -1) && (self.input[0].x == 0 || ((!self.IsTileSolid(1, -1, -1) || !self.IsTileSolid(1, 1, -1)) && self.IsTileSolid(1, self.input[0].x, 0))))
+        {
+            self.emoteSleepCounter += 0.028f;
+        }
+        else
+        {
+            self.emoteSleepCounter = 0f;
+        }
+        if (self.emoteSleepCounter > 1.4f)
+        {
+            self.sleepCurlUp = Mathf.SmoothStep(self.sleepCurlUp, 1f, self.emoteSleepCounter - 1.4f);
+            return;
+        }
+        self.sleepCurlUp = Mathf.Max(0f, self.sleepCurlUp - 0.1f);
+    }
+
+    private static void Player_SleepUpdate(MonoMod.Cil.ILContext il)
+    {
+        ILCursor c = new(il);
+
+        ILLabel jump = c.DefineLabel();
+
+        // Player.InputPackage inputPackage = RWInput.PlayerInput(this.playerState.playerNumber);
+        // <if(this.controller != null) inputPackage = this.input[0];>
+        if(c.TryGotoNext(MoveType.After, x => x.MatchCall(nameof(RWInput),nameof(RWInput.PlayerInput)))
+            && c.TryGotoNext(MoveType.After, x => x.MatchStloc(2)))
+        {
+            c.Emit(OpCodes.Ldarg_0);
+            c.EmitDelegate<Predicate<Player>>((Player p) => p.controller != null);
+            c.Emit(OpCodes.Brfalse, jump);
+
+            c.Emit(OpCodes.Ldarg_0);
+            c.EmitDelegate<Func<Player, Player.InputPackage>>((Player p) =>
+            {
+                var result = p.input[0];
+                if(result.x == 0 && p.IsTileSolid(1, 0, -1)) {
+                    p.forceSleepCounter++;
+                }
+                MainLogic.logger.LogInfo("controlled update. sleep counter is " + p.forceSleepCounter);
+                return result;
+            });
+            c.Emit(OpCodes.Stloc_2);
+
+            c.MarkLabel(jump);
+        }
     }
 }
