@@ -11,7 +11,7 @@ public class Teleporter : UpdatableAndDeletable
 {
     public static void RegisterObject()
     {
-        RegisterFullyManagedObjectType(managedFields, typeof(Teleporter), "PVTeleporter");
+        RegisterFullyManagedObjectType(managedFields, typeof(Teleporter), "PVTeleporter", StaticStuff.PreservatoryPOMCategory);
     }
 
     //ROM fields

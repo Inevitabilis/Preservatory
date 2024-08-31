@@ -101,7 +101,7 @@ public class ExposedSoundController : UpdatableAndDeletable
 
     public static void RegisterObject()
     {
-        RegisterFullyManagedObjectType(managedFields, typeof(ExposedSoundController), "PVSoundController");
+        RegisterFullyManagedObjectType(managedFields, typeof(ExposedSoundController), "PVSoundController", StaticStuff.PreservatoryPOMCategory);
     }
 
     //ROM fields

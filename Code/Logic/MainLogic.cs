@@ -12,6 +12,8 @@ using System.Linq;
 using PVStuff.Logic;
 using PVStuff.Logic.POM_objects;
 using BepInEx.Logging;
+using PVStuff.Logic.ControllerParser;
+
 
 
 
@@ -44,6 +46,7 @@ internal static class MainLogic
         On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
         PVEnums.Melody.Register();
         PVEnums.NPCBehaviour.Register();
+        _ControllerMeta.Startup();
         //for things that do not receive local updates
         On.RainWorldGame.Update += static (orig, self) =>
         {

@@ -66,8 +66,7 @@ public static class StaticStuff
     public static bool logging = false;
     public const int TicksPerSecond = 40;
     public const bool devBuild = true;
-    public static short[] playerColorableSpritesIndices = [0,1,2,3,4,5,6,7,8];
-    public static short playerEyeColorIndex = 10;
+    public const string PreservatoryPOMCategory = "Preservatory";
 
     public static void loginf(object e) => MainLogic.logger.LogInfo(e);
     public static void logerr(object e) => MainLogic.logger.LogError(e);

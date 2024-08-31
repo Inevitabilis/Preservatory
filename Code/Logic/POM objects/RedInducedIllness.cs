@@ -11,7 +11,7 @@ public class RedInducedIllness : UpdatableAndDeletable
 {
     public static void RegisterObject()
     {
-        RegisterFullyManagedObjectType(managedFields, typeof(RedInducedIllness), "PVRedInducedIllness");
+        RegisterFullyManagedObjectType(managedFields, typeof(RedInducedIllness), "PVRedInducedIllness", StaticStuff.PreservatoryPOMCategory);
     }
 
     internal static ManagedField[] managedFields = [

@@ -19,11 +19,12 @@ internal static class DebugPrintKeyboardInputs
 
     public static void Startup()
     {
-        On.RainWorld.Update += static (orig, self) =>
+        On.RainWorldGame.Update += static (orig, self) =>
         {
             orig(self);
             pressDelay--;
-            if(Input.GetKeyDown(KeyCode.Backspace) && pressDelay < 0)
+            //loginf("am i pressing B? " + Input.GetKeyDown(KeyCode.B));
+            if(Input.GetKeyDown(KeyCode.B) && pressDelay < 0)
             {
                 pressDelay = ticksBetweenPresses;
                 logKeyboard = !logKeyboard;
@@ -35,7 +36,7 @@ internal static class DebugPrintKeyboardInputs
             if(logKeyboard)
             {
                 ControlInstruction instruction = new(result);
-                StaticStuff.loginf(instruction);
+                StaticStuff.loginf("input: " + instruction);
             }
             return result;
             

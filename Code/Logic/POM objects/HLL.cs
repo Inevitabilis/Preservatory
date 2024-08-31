@@ -10,7 +10,7 @@ public class HLL : UpdatableAndDeletable
 {
     public static void RegisterObject()
     {
-        RegisterFullyManagedObjectType(managedFields, typeof(HLL), "HLLSpawner");
+        RegisterFullyManagedObjectType(managedFields, typeof(HLL), "HLLSpawner", StaticStuff.PreservatoryPOMCategory);
     }
 
     internal static ManagedField[] managedFields = [
