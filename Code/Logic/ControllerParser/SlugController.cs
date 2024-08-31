@@ -31,7 +31,8 @@ internal class SlugController : Player.PlayerController
 	{
 		Stand,
 		DeleteController,
-		Loop
+		Loop,
+		RepeatLastKey
 	}
 	public bool SlatedForDeletion = false;
 
@@ -42,7 +43,8 @@ internal class SlugController : Player.PlayerController
 	internal EndAction endAction = EndAction.Stand;
 	internal List<SpannedControlInstruction> spannedControlInstructions = [];
 	internal Dictionary<int, ControlInstruction> instantInstructions = new();
-
+	internal ControlInstruction lastInstruction = new();
+	
 	#endregion
 
 
@@ -52,9 +54,8 @@ internal class SlugController : Player.PlayerController
 
 	public override Player.InputPackage GetInput()
 	{
-		ControlInstruction output = GetCurrentInput();
+		ControlInstruction output = lastInstruction = GetCurrentInput();
 		controllerTimer++;
-		//loginf($"controller tick {controllerTimer}. returning " + output);
 		return (output ?? new ControlInstruction()).ToPackage();
 	}
 
@@ -74,6 +75,7 @@ internal class SlugController : Player.PlayerController
 		if(spanInstrIndex >= spannedControlInstructions.Count) //if no valid ones were found, we stand and wait for all instant actions to work
 		{
 			if (controllerTimer >= tickLimit) EndLogic();
+			if (endAction == EndAction.RepeatLastKey && controllerTimer >= tickLimit) return lastInstruction;
 			return new();
 		}
         #endregion

@@ -142,6 +142,11 @@ internal class InstructionsLoader
             endAction = SlugController.EndAction.DeleteController;
             return true;
         }
+        else if (str == "hold last key")
+        {
+            endAction = SlugController.EndAction.RepeatLastKey;
+            return true;
+        }
         return false;
     }
 
