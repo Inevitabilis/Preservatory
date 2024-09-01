@@ -15,8 +15,9 @@ public class RedInducedIllness : UpdatableAndDeletable
     }
 
     internal static ManagedField[] managedFields = [
-        new FloatField("effect time", float.NegativeInfinity, float.PositiveInfinity, 0f, control: ManagedFieldWithPanel.ControlType.text),
-        new FloatField("delay", float.NegativeInfinity, float.PositiveInfinity, 0f, control: ManagedFieldWithPanel.ControlType.text),
+        new FloatField("effect time", 0f, float.PositiveInfinity, 5f, control: ManagedFieldWithPanel.ControlType.text),
+        new FloatField("severity", 0f, 2f, 1f, displayName: "severity"),
+        new FloatField("delay", 0f, float.PositiveInfinity, 0f, control: ManagedFieldWithPanel.ControlType.text),
         new BooleanField("malnourishing", false),
         POMUtils.defaultVectorField
     ];
@@ -25,7 +26,7 @@ public class RedInducedIllness : UpdatableAndDeletable
     /// <summary>
     /// how much seconds will pass between triggering polygon and striking cat
     /// </summary>
-    public float delay => data.GetValue<float>("float");
+    public float delay => data.GetValue<float>("delay");
     /// <summary>
     /// trigger zone
     /// </summary>
@@ -33,7 +34,8 @@ public class RedInducedIllness : UpdatableAndDeletable
     /// <summary>
     /// how bad the asthma attack will be, preferably within 0-1
     /// </summary>
-    public float asthmaSeconds => data.GetValue<float>("asthmaSeconds");
+    public float asthmaSeconds => data.GetValue<float>("effect time");
+    public float severity => data.GetValue<float>("severity");
     public bool triggersMalnourishment => data.GetValue<bool>("malnourishing");
 
     ManagedData data;
@@ -106,7 +108,8 @@ public class RedInducedIllness : UpdatableAndDeletable
     }
     void AsthmaTime(Player redCat)
     {
-        effect = new Asthma(redCat, asthmaSeconds, triggersMalnourishment);
+        effect = new Asthma(redCat, asthmaSeconds, triggersMalnourishment, severity);
+        MainLogic.logger.LogInfo("making asthma with " + asthmaSeconds + " seconds of time");
         room.AddObject(effect);
     }
 }
@@ -116,17 +119,18 @@ public class RedInducedIllness : UpdatableAndDeletable
 /// </summary>
 public class Asthma : CosmeticSprite
 {
-    public Asthma(Player redCat, float strSeconds, bool malnourishing)
+    public Asthma(Player redCat, float strSeconds, bool malnourishing, float severity = 1f)
     {
         this.redCat = redCat;
         strokeSeconds = strSeconds;
         this.malnourishing = malnourishing;
+        this.fitSeverity = severity;
     }
 
     DisembodiedDynamicSoundLoop? soundLoop;
     Player redCat;
     bool malnourishing;
-    float strokeSeconds, fitSeverity = 1, progress = 0, sin, fluc, fluc1, fluc2, fluc3, rotDir;
+    float strokeSeconds, fitSeverity, progress = 0, sin, fluc, fluc1, fluc2, fluc3, rotDir;
     float strokeTicks => strokeSeconds * StaticStuff.TicksPerSecond;
     float fit => progress;
     float CurrentFitIntensity => Mathf.Pow(Mathf.Clamp01(Mathf.Sin(fit * 3.1415927f) * 1.2f), 1.6f) * fitSeverity;
@@ -155,7 +159,7 @@ public class Asthma : CosmeticSprite
             viableFade = Mathf.Max(0f, viableFade - 0.033333335f);
             if (viableFade <= 0f && lastViableFade <= 0f)
             {
-                Destroy();
+                //Destroy();
             }
         }
         else
@@ -173,8 +177,10 @@ public class Asthma : CosmeticSprite
 
     private void PlayerInteraction()
     {
+        MainLogic.logger.LogInfo("player interaction. aerobic level is " + redCat.aerobicLevel);
         redCat.aerobicLevel = Mathf.Max(CurrentFitIntensity, redCat.aerobicLevel);
-        if(!redCat.Malnourished && malnourishing) redCat.SetMalnourished(true);
+        if(redCat.aerobicLevel >= .8f) redCat.exhausted = true;
+        redCat.SetMalnourished(malnourishing);
     }
 
     public override void Destroy()
