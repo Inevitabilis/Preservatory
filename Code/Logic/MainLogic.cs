@@ -59,11 +59,7 @@ internal static class MainLogic
             globalUpdateReceivers.ForEach(x => x.Update());
             if (Input.GetKey(KeyCode.Backspace)) StaticStuff.logging = true;
         };
-#if USEPOM
         RegisterPOMObjects();
-#else
-        RegisterROMObjects();
-#endif
         SaveManager.ApplyHooks();
         initialized = true;
     }
@@ -85,7 +81,6 @@ internal static class MainLogic
             }
         }
     }
-#if USEPOM
     static internal void RegisterPOMObjects()
     {
         HLL.RegisterObject();
@@ -94,19 +89,7 @@ internal static class MainLogic
         VatScene.RegisterEffect();
         ExposedSoundController.RegisterObject();
         ControlledSlugcat.Register();
-        }
-#else
-    static internal void RegisterROMObjects()
-    {
-        TypeOperator.RegisterType<ExposedSoundControllerOperator>();
-        TypeOperator.RegisterType<DreamEnderOperator>();
-        TypeOperator.RegisterType<VatSceneOperator>();
-        TypeOperator.RegisterType<RedIllnessOperator>();
-        TypeOperator.RegisterType<HLLOperator>();
-        TypeOperator.RegisterType<PVSlugNPCOperator>();
-        PVSlugNPC.ApplyHooks();
     }
-#endif
     private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
     {
         if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot,self.sceneID.GetCharacterFromSelectScene())))
