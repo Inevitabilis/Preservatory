@@ -72,43 +72,6 @@ public static class StaticStuff
     public static void logerr(object e) => MainLogic.logger.LogError(e);
 
     public static Vector2 centerOfOneScreenRoom = new(482, 349);
-    public static void TeleportCreaturesIntoRoom(this List<AbstractCreature> abstractCreatures, World world, RainWorldGame game, Destination d)
-    {
-        AbstractRoom room = world.GetAbstractRoom(d.roomName);
-        room.RealizeRoom(world, game);
-        while (world.loadingRooms.Count > 0)
-        {
-
-                for (int j = world.loadingRooms.Count - 1; j >= 0; j--)
-                {
-                    if (world.loadingRooms[j].done)
-                    {
-                        world.loadingRooms.RemoveAt(j);
-                    }
-                    else
-                    {
-                        world.loadingRooms[j].Update();
-                    }
-                }
-            
-        }
-        RWCustom.IntVector2 middleOfRoom = new(room.realizedRoom.TileWidth / 2 + 10, room.realizedRoom.TileHeight / 2);
-        WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.realizedRoom.GetTilePosition(d.position), room.index);
-        abstractCreatures.ForEach(creature => creature.pos = destination);
-        abstractCreatures.ForEach(absPlayer =>
-        {
-            absPlayer.RealizeInRoom();
-            ((Player)absPlayer.realizedCreature).SuperHardSetPosition(d.position);
-            ((Player)absPlayer.realizedCreature).graphicsModule?.Reset();
-            ((Player)absPlayer.realizedCreature).standing = true;
-        });
-        room.world.game.roomRealizer.followCreature = abstractCreatures[0];
-        game.cameras[0].MoveCamera(room.realizedRoom, 0);
-        game.cameras[0].virtualMicrophone.AllQuiet();
-        game.cameras[0].virtualMicrophone.NewRoom(game.cameras[0].room);
-
-
-    }
     public static ScreenFlasher RegisterScreenFlasher(RoomCamera rCam)
     {
         ScreenFlasher screenFlasher = new();

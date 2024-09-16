@@ -90,7 +90,7 @@ public class Teleporter : UpdatableAndDeletable
     {
         if (hash != this.GetHashCode()) return;
         Destination destination = GetDestination(room.game.StoryCharacter);
-        room.game.AlivePlayers.TeleportCreaturesIntoRoom(room.world, room.game, destination);
+        TeleportCreaturesIntoRoom(room.game.AlivePlayers, room.world, room.game, destination);
         if(destination.roomName == "PV_DREAM_TREE03")
         {
             room.game.AlivePlayers.ForEach(x =>
@@ -129,6 +129,64 @@ public class Teleporter : UpdatableAndDeletable
             Function.startDream => PVMaps.GetDreamDestination(name),
             _ => PVMaps.GetEndDestination(name)
         };
+    }
+
+
+
+
+    public static void TeleportCreaturesIntoRoom(List<AbstractCreature> abstractCreatures, World world, RainWorldGame game, Destination d)
+    {
+        AbstractRoom room = world.GetAbstractRoom(d.roomName);
+        room.RealizeRoom(world, game);
+        while (world.loadingRooms.Count > 0)
+        {
+
+            for (int j = world.loadingRooms.Count - 1; j >= 0; j--)
+            {
+                if (world.loadingRooms[j].done)
+                {
+                    world.loadingRooms.RemoveAt(j);
+                }
+                else
+                {
+                    world.loadingRooms[j].Update();
+                }
+            }
+
+        }
+        RWCustom.IntVector2 middleOfRoom = new(room.realizedRoom.TileWidth / 2 + 10, room.realizedRoom.TileHeight / 2);
+        WorldCoordinate destination = RWCustom.Custom.MakeWorldCoordinate(room.realizedRoom.GetTilePosition(d.position), room.index);
+        abstractCreatures.ForEach(creature =>
+        {
+            if(creature.realizedCreature is Player p)
+            {
+                p.slugOnBack?.DropSlug();
+                p.spearOnBack?.DropSpear();
+                foreach (Creature.Grasp? grasp in p.grasps)
+                {
+                    grasp?.Release();
+                }
+            }
+            creature.pos = destination;
+
+        });
+        abstractCreatures.ForEach(absPlayer =>
+        {
+            absPlayer.RealizeInRoom();
+            if(absPlayer.realizedCreature is Player player)
+            {
+                player.SuperHardSetPosition(d.position);
+                Array.ForEach(player.bodyChunks, chunk => chunk.vel = Vector2.zero);
+                player.graphicsModule?.Reset();
+                player.standing = true;
+            }
+        });
+        room.world.game.roomRealizer.followCreature = abstractCreatures[0];
+        game.cameras[0].MoveCamera(room.realizedRoom, 0);
+        game.cameras[0].virtualMicrophone.AllQuiet();
+        game.cameras[0].virtualMicrophone.NewRoom(game.cameras[0].room);
+
+
     }
     #endregion
 
