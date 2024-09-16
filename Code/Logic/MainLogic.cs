@@ -17,14 +17,9 @@ using PVStuff.Logic.ControllerParser;
 
 
 
-#if USEPOM
+
 using PVStuffMod.Logic.POM_objects;
-#else
-using PVStuffMod.Logic.ROM_objects;
-using PVStuff.Logic.ROM_objects;
-using ROM.RoomObjectService;
-using Newtonsoft.Json.Bson;
-#endif
+
 
 namespace PVStuffMod;
 
