@@ -26,7 +26,6 @@ end action: hold last key
 //spanned instructions overlapping are treated trivially due to the way controller works
 //it will always use current span instruction until it's invalid, then look for the next span instruction that can be used now or in the future
 //their order is the same as you write here. so in this instance ticks 41,42,43 will be dedicated to instants, ticks 44-120 - to left, and 121 to 200 - to right
-//and also the following instruction will then result in only 201-400 being action
 121-200:
 //the code parsing commands works as follows: a default command is created, then every argument is applied to change it
 //which means that if no argument is specified, the input is valid and says "do nothing"
