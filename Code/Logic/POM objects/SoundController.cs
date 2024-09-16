@@ -46,10 +46,10 @@ public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
         {
             disembodiedLoopEmitters =
             [
-                CreateNewSoundLoop(PVEnums.Melody.approach0, 0, 1, 1),
-                CreateNewSoundLoop(PVEnums.Melody.approach1, 0, 1, 1),
-                CreateNewSoundLoop(PVEnums.Melody.approach2, 0, 1, 1),
-                CreateNewSoundLoop(PVEnums.Melody.approach3, 0, 1, 1),
+                CreateNewSoundLoop(PVEnums.Melody.approach0, 0, 1, 0),
+                CreateNewSoundLoop(PVEnums.Melody.approach1, 0, 1, 0),
+                CreateNewSoundLoop(PVEnums.Melody.approach2, 0, 1, 0),
+                CreateNewSoundLoop(PVEnums.Melody.approach3, 0, 1, 0),
             ];
             Array.ForEach(disembodiedLoopEmitters, x => x.requireActiveUpkeep = false);
         }
@@ -140,9 +140,7 @@ public class ExposedSoundController : UpdatableAndDeletable
     {
         base.Update(eu);
 
-        UpdateSoundController();
-
-#if USEPOM
+        internalSoundController.room ??= this.room;
         if (lingerTimer > 0) lingerTimer--;
         else if (internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
         if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom
@@ -152,12 +150,8 @@ public class ExposedSoundController : UpdatableAndDeletable
             internalSoundController.controllerReference = this;
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
         }
-#endif
     }
-    private void UpdateSoundController()
-    {
-        internalSoundController.room ??= this.room;
-    }
+
 
 
 #endregion
