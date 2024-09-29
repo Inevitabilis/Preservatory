@@ -14,44 +14,54 @@ namespace PVStuffMod.Logic.POM_objects;
 /// <summary>
 /// ROM can only work with room specific objects as of now, so to prevent it from disappearing the exposed objects are different
 /// </summary>
-public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
+public class InternalSoundController : IReceiveWorldTicks
 {
-    DisembodiedLoopEmitter[]? disembodiedLoopEmitters;
+    WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
     public ExposedSoundController? controllerReference;
-    public bool SlatedForDeletion => false;
+    public bool SlatedForDeletion => weakRefGame.TryGetTarget(out _);
+    public WeakReference<RainWorldGame> weakRefGame;
+    public InternalSoundController(RainWorldGame game)
+    {
+        weakRefGame = new WeakReference<RainWorldGame>(game);
+    }
 
 
     public void Update()
     {
-        if (room == null) return;
         SoundLoopMaintenance();
         VolumeSlidersLogic();
     }
     DisembodiedLoopEmitter CreateNewSoundLoop(SoundID? soundID, float vol, float pitch, float pan)
     {
         DisembodiedLoopEmitter emitter = new(vol, pitch, pan);
-        for (int i = 0; i < room.game.cameras.Length; i++)
+        if(weakRefGame.TryGetTarget(out var game))
         {
-            if (room.game.cameras[i].room == room)
-            {
-                PlayRoomlessDisembodiedLoop(room.game.cameras[i].virtualMicrophone, soundID, emitter, pan, vol, pitch);
-            }
-        }
+            PlayRoomlessDisembodiedLoop(game.cameras[0].virtualMicrophone, soundID, emitter, pan, vol, pitch);
+        }    
         return emitter;
     }
     void SoundLoopMaintenance()
     {
-        VirtualMicrophone virtualMicrophone = room.game.cameras[0].virtualMicrophone;
-        if (disembodiedLoopEmitters == null || !virtualMicrophone.soundObjects.Exists(x => x is RoomlessDisembodiedLoop loop && loop.controller == disembodiedLoopEmitters[0]))
+        if(weakRefGame.TryGetTarget(out var game))
         {
-            disembodiedLoopEmitters =
-            [
-                CreateNewSoundLoop(PVEnums.Melody.approach0, 0, 1, 0),
-                CreateNewSoundLoop(PVEnums.Melody.approach1, 0, 1, 0),
-                CreateNewSoundLoop(PVEnums.Melody.approach2, 0, 1, 0),
-                CreateNewSoundLoop(PVEnums.Melody.approach3, 0, 1, 0),
-            ];
-            Array.ForEach(disembodiedLoopEmitters, x => x.requireActiveUpkeep = false);
+            VirtualMicrophone virtualMicrophone = game.cameras[0].virtualMicrophone;
+            if (disembodiedLoopEmitters == null || !disembodiedLoopEmitters[0].TryGetTarget(out _))
+            {
+                disembodiedLoopEmitters =
+                [
+                    new(CreateNewSoundLoop(PVEnums.Melody.approach0, 0, 1, 0)),
+                    new(CreateNewSoundLoop(PVEnums.Melody.approach1, 0, 1, 0)),
+                    new(CreateNewSoundLoop(PVEnums.Melody.approach2, 0, 1, 0)),
+                    new(CreateNewSoundLoop(PVEnums.Melody.approach3, 0, 1, 0)),
+                ];
+                Array.ForEach(disembodiedLoopEmitters, x =>
+                {
+                    if(x.TryGetTarget(out var target))
+                    {
+                        target.requireActiveUpkeep = false;
+                    }
+                });
+            }
         }
     }
     void VolumeSlidersLogic()
@@ -60,7 +70,8 @@ public class InternalSoundController : UpdatableAndDeletable, IReceiveWorldTicks
 
         for (short i = 0; i < disembodiedLoopEmitters.Length; i++)
         {
-            disembodiedLoopEmitters[i].volume = Mathf.Lerp(disembodiedLoopEmitters[i].volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
+            disembodiedLoopEmitters[i].TryGetTarget(out var disembodiedLoopEmitter);
+            disembodiedLoopEmitter.volume = Mathf.Lerp(disembodiedLoopEmitter.volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
         }
     }
     static void PlayRoomlessDisembodiedLoop(VirtualMicrophone mic, SoundID? soundId, DisembodiedLoopEmitter emitter, float pan, float vol, float pitch)
@@ -139,15 +150,14 @@ public class ExposedSoundController : UpdatableAndDeletable
     public override void Update(bool eu)
     {
         base.Update(eu);
-
-        internalSoundController.room ??= this.room;
         if (lingerTimer > 0) lingerTimer--;
-        else if (internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
+        else if (internalSoundControllerRef.TryGetValue(room.game, out var internalSoundController) && internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
         if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom
         && abstractCreature.realizedCreature != null
-        && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos)))
+        && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos))
+            && internalSoundControllerRef.TryGetValue(room.game, out var internalSoundController2))
         {
-            internalSoundController.controllerReference = this;
+            internalSoundController2.controllerReference = this;
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
         }
     }

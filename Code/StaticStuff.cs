@@ -76,7 +76,7 @@ public static class StaticStuff
     {
         ScreenFlasher screenFlasher = new();
         rCam.NewObjectInRoom(screenFlasher);
-        MainLogic.globalUpdateReceivers.Add(screenFlasher);
+        MainLogic.screenFlasherRef.Add(rCam.game, screenFlasher);
         return screenFlasher;
     }
     public struct Destination
