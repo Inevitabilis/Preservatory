@@ -1,11 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using ROM.RoomObjectService;
-using ROM.UserInteraction.InroomManagement;
-using ROM.UserInteraction.ObjectEditorElement;
-using ROM.UserInteraction.ObjectEditorElement.Scrollbar;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System;
 using UnityEngine;
 using static Pom.Pom;
 using static PVStuffMod.MainLogic;
@@ -16,9 +9,9 @@ namespace PVStuffMod.Logic.POM_objects;
 /// </summary>
 public class InternalSoundController : IReceiveWorldTicks
 {
-    WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
+    public WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
     public ExposedSoundController? controllerReference;
-    public bool SlatedForDeletion => weakRefGame.TryGetTarget(out _);
+    public bool SlatedForDeletion => !weakRefGame.TryGetTarget(out _);
     public WeakReference<RainWorldGame> weakRefGame;
     public InternalSoundController(RainWorldGame game)
     {
@@ -34,15 +27,15 @@ public class InternalSoundController : IReceiveWorldTicks
     DisembodiedLoopEmitter CreateNewSoundLoop(SoundID? soundID, float vol, float pitch, float pan)
     {
         DisembodiedLoopEmitter emitter = new(vol, pitch, pan);
-        if(weakRefGame.TryGetTarget(out var game))
+        if (weakRefGame.TryGetTarget(out var game))
         {
             PlayRoomlessDisembodiedLoop(game.cameras[0].virtualMicrophone, soundID, emitter, pan, vol, pitch);
-        }    
+        }
         return emitter;
     }
     void SoundLoopMaintenance()
     {
-        if(weakRefGame.TryGetTarget(out var game))
+        if (weakRefGame.TryGetTarget(out var game))
         {
             VirtualMicrophone virtualMicrophone = game.cameras[0].virtualMicrophone;
             if (disembodiedLoopEmitters == null || !disembodiedLoopEmitters[0].TryGetTarget(out _))
@@ -56,7 +49,7 @@ public class InternalSoundController : IReceiveWorldTicks
                 ];
                 Array.ForEach(disembodiedLoopEmitters, x =>
                 {
-                    if(x.TryGetTarget(out var target))
+                    if (x.TryGetTarget(out var target))
                     {
                         target.requireActiveUpkeep = false;
                     }
@@ -127,9 +120,9 @@ public class ExposedSoundController : UpdatableAndDeletable
 
     public Vector2[]? Polygon => POMUtils.AddRealPosition(data.GetValue<Vector2[]>("trigger zone"), pObj.pos);
     public float[] volumeSliders => [
-        data.GetValue<float>("Melody 1"), 
-        data.GetValue<float>("Melody 2"), 
-        data.GetValue<float>("Melody 3"), 
+        data.GetValue<float>("Melody 1"),
+        data.GetValue<float>("Melody 2"),
+        data.GetValue<float>("Melody 3"),
         data.GetValue<float>("Melody 4")];
     public float linger => data.GetValue<float>("linger");
 
@@ -164,7 +157,7 @@ public class ExposedSoundController : UpdatableAndDeletable
 
 
 
-#endregion
+    #endregion
 }
 
 public class RoomlessDisembodiedLoop : VirtualMicrophone.SoundObject
