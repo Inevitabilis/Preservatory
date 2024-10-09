@@ -1,0 +1,13 @@
+CreatureGroup - LIZ - chance:0.5
+Creature - Pink - dens:6,7 - chance:0.5 - group:LIZ - amount:1-2
+Creature - Blue - dens:4,5,6,7 - chance:0.5 - group:LIZ - amount:1-2
+Creature - White - dens:4,5,6,7 - chance:0.3 - group:LIZ - amount:1-2
+
+Creature - DropBug - dens:4,5,6,7 - chance:0.3 - amount:1-2
+
+Creature - Scutigera - dens:4,5,6,7 - chance:0.3 - amount:1-2
+
+CreatureGroup - SPIDERS - chance:0.4
+Creature - Spider - dens:4,5,6,7 - chance:0.8 - group:SPIDERS - amount:3-6
+Creature - Big Spider - dens:4,5,6,7 - chance:0.8 - group:SPIDERS - amount:2-4
+Creature - Spitter Spider - dens:4,5,6,7 - chance:0.4 - group:SPIDERS - amount:1

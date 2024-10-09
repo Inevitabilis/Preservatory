@@ -49,21 +49,21 @@ PV_DREAM_ARTI : DISCONNECTED, DISCONNECTED : SWARMROOM
 END ROOMS
 CREATURES
 
-PV_G01 : 10-TentaclePlant-{Ignorecycle}, 5-TentaclePlant-{Ignorecycle}, 7-TentaclePlant-{Ignorecycle}, 9-TentaclePlant-{Ignorecycle}, 8-TentaclePlant-{Ignorecycle}, 6-WhiteLizard-{Ignorecycle}
+PV_G01 : 10-TentaclePlant-{Ignorecycle}, 5-TentaclePlant-{Ignorecycle}, 7-TentaclePlant-{Ignorecycle}, 9-TentaclePlant-{Ignorecycle}, 8-TentaclePlant-{Ignorecycle}
 PV_C05 : 7-TentaclePlant-{Ignorecycle}, 6-PinkLizard-{Ignorecycle}
 PV_A07 : 2-TentaclePlant-{Ignorecycle}, 4-WhiteLizard-{Ignorecycle}
-PV_D01 : 8-TentaclePlant-{Ignorecycle}, 4-PinkLizard-{Ignorecycle}, 7-BlueLizard-{Ignorecycle}, 5-WhiteLizard-{Ignorecycle}
+PV_D01 : 8-TentaclePlant-{Ignorecycle}, 4-PinkLizard-{Ignorecycle}, 7-BlueLizard-{Ignorecycle}
 PV_A05 : 2-BlueLizard-{Ignorecycle}
 PV_D02 : 3-BlueLizard-{Ignorecycle}, 7-RedLizard-{Ignorecycle}, 6-BlueLizard-{Ignorecycle}, 5-GreenLizard-{Ignorecycle}
 PV_C03 : 6-PinkLizard-{Ignorecycle}, 3-BlueLizard-{Ignorecycle}, 5-PinkLizard-{Ignorecycle}
 PV_C04 : 5-BlueLizard-{Ignorecycle}, 6-GreenLizard-{Ignorecycle}
 PV_B03 : 4-GreenLizard-{Ignorecycle}, 3-PinkLizard-{Ignorecycle}
-PV_B04 : 2-PinkLizard-{Ignorecycle}, 3-PinkLizard-{Ignorecycle}
 PV_A09 : 2-PinkLizard-{Ignorecycle}
 PV_C06 : 5-GreenLizard-{Ignorecycle}
-PV_B05 : 4-WhiteLizard-{Ignorecycle}, 2-RedLizard-{Ignorecycle}
 PV_A08 : 3-BlueLizard-{Ignorecycle}
 PV_D04 : 3-Inspector-{Ignorecycle}
 PV_I01 : 7-Inspector-{Ignorecycle}
-PV_A06 : 2-WhiteLizard-{Ignorecycle}
+PV_A06 : 2-WhiteLizard-{Ignorecycle}-2
+PV_B04 : 2-WhiteLizard
+PV_B05 : 4-YellowLizard-4
 END CREATURES
