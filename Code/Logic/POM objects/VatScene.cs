@@ -58,7 +58,6 @@ public class VatScene : UpdatableAndDeletable
                 }
             case State.timedIdle:
                 {
-                    timer++;
                     if(timer == delayBeforeFlash * StaticStuff.TicksPerSecond)
                     {
                         state = State.flashCommencing;
@@ -66,6 +65,7 @@ public class VatScene : UpdatableAndDeletable
                         flasher.TickInTheMiddleOfIdling += Ending;
                         flasher.RequestScreenFlash(this.GetHashCode(), Color.black);
                     }
+                    timer++;
                     break;
                 }
             default:
