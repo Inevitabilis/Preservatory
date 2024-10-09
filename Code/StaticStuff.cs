@@ -138,7 +138,7 @@ public static class PVMaps
         };
         endRoom = new()
         {
-            { Red, new() { roomName = "PV_END_RED", position = new(482, 349) } }
+            { Red, new() { roomName = "PV_END_RED", position = new(0,0) } }
         };
 
 
