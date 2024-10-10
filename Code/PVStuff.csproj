@@ -9,17 +9,11 @@
     <DefineConstants>$(DefineConstants);USEPOM</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Logic\ROM objects\VatScene.cs" />
-    <Compile Remove="Logic\TheEgg.cs" />
-  </ItemGroup>
-  <ItemGroup>
 	  <Reference Include="References/*.dll">
 		  <Private>false</Private>
 	  </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Logic\ROM objects\VatScene.cs" />
-  </ItemGroup>
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ProjectDir)../Preservatory/plugins/" />
 	</Target>
