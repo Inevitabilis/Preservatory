@@ -121,7 +121,7 @@ public class Teleporter : UpdatableAndDeletable
 
     }
 
-    bool AnyPlayersWithinArea => room.game.AlivePlayers.Exists((AbstractCreature x) => ROMUtils.PositionWithinPoly(Polygon, x.realizedCreature.mainBodyChunk.pos));
+    bool AnyPlayersWithinArea => room.game.AlivePlayers.Exists((AbstractCreature x) => ROMUtils.PositionWithinPoly(Polygon, x.realizedCreature.mainBodyChunk.pos) && room.abstractRoom == x.Room);
     Destination GetDestination(SlugcatStats.Name name)
     {
         return function switch
