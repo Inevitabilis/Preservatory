@@ -63,8 +63,10 @@ public class InternalSoundController : IReceiveWorldTicks
 
         for (short i = 0; i < disembodiedLoopEmitters.Length; i++)
         {
-            disembodiedLoopEmitters[i].TryGetTarget(out var disembodiedLoopEmitter);
-            disembodiedLoopEmitter.volume = Mathf.Lerp(disembodiedLoopEmitter.volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
+            if(disembodiedLoopEmitters[i].TryGetTarget(out var disembodiedLoopEmitter))
+            {
+                disembodiedLoopEmitter.volume = Mathf.Lerp(disembodiedLoopEmitter.volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
+            }
         }
     }
     static void PlayRoomlessDisembodiedLoop(VirtualMicrophone mic, SoundID? soundId, DisembodiedLoopEmitter emitter, float pan, float vol, float pitch)
@@ -154,9 +156,6 @@ public class ExposedSoundController : UpdatableAndDeletable
             lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
         }
     }
-
-
-
     #endregion
 }
 
