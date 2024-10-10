@@ -7,6 +7,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
 using PVStuffMod;
+using System.Runtime.CompilerServices;
 
 namespace PVStuff.Logic.POM_objects;
 
@@ -19,16 +20,14 @@ public class ControlledSlugcat : UpdatableAndDeletable
         NPCHooks.Hook();
     }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public ControlledSlugcat(Room room, PlacedObject pObj)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         this.room = room;
-#pragma warning disable CS8601 // Possible null reference assignment.
-        this.data = pObj.data as ManagedData;
-#pragma warning restore CS8601 // Possible null reference assignment.
+        this.firstTime = room.abstractRoom.firstTimeRealized;
+        if (pObj.data is ManagedData data) this.data = data;
+        else throw new ArgumentException("Controlled slugcat got invalid data as input");
     }
-
+    #region fields
     internal static ManagedField[] fields = [
             new StringField("controllerID", "test", "controller ID"),
             new BooleanField("adult", true, displayName: "adult?"),
@@ -52,7 +51,7 @@ public class ControlledSlugcat : UpdatableAndDeletable
     public bool isEnabled => data.GetValue<bool>("enabled");
 
     public SerializableColor serializableColor = new(1f, 1f, 1f);
-
+    #endregion
 
     public class SerializableColor
     {
@@ -79,14 +78,14 @@ public class ControlledSlugcat : UpdatableAndDeletable
     }
     #region runtime variables
     [JsonIgnore]
-    AbstractCreature? puppet;
+    WeakReference<AbstractCreature>? puppetWeakRef;
     [JsonIgnore]
     Player puppetPlayer
     {
         get
         {
-            if (puppet?.realizedCreature is Player p) return p;
-            else if (puppet is null) throw new System.Exception($"[PRESERVATORY]: {nameof(ControlledSlugcat)}.{nameof(ControlledSlugcat.puppetPlayer)} - puppet was null");
+            if (puppetWeakRef is not null && puppetWeakRef.TryGetTarget(out var puppet) && puppet.realizedCreature is Player p) return p;
+            else if (puppetWeakRef is null) throw new System.Exception($"[PRESERVATORY]: {nameof(ControlledSlugcat)}.{nameof(ControlledSlugcat.puppetPlayer)} - puppet was null");
             else throw new System.Exception($"[PRESERVATORY]: {nameof(ControlledSlugcat)}.{nameof(ControlledSlugcat.puppetPlayer)} - realized creature of puppet was not player");
         }
     }
@@ -94,46 +93,56 @@ public class ControlledSlugcat : UpdatableAndDeletable
     WorldCoordinate blockPosition => room.ToWorldCoordinate(startPosition);
     [JsonIgnore]
     bool initdone;
+    [JsonIgnore]
+    bool firstTime;
     #endregion
 
     public override void Destroy()
     {
-        if (puppetPlayer is Player p) p.Destroy();
         base.Destroy();
+        if (puppetPlayer is Player p) p.Destroy();
+        if (puppetWeakRef is not null && puppetWeakRef.TryGetTarget(out var puppet))
+        {
+            foreach (var absRoom in room.world.abstractRooms)
+            {
+                if(absRoom.entities.Contains(puppet))
+                {
+                    absRoom.RemoveEntity(puppet);
+                    break;
+                }
+            }
+        }
     }
 
 
     public override void Update(bool eu)
     {
-        if (initdone && !room.roomSettings.placedObjects.Contains(data.owner)) Destroy();
-        if (!(room.fullyLoaded && room.ReadyForPlayer && room.shortCutsReady && isEnabled)) return;
-        if (IsValidToSpawnForCharacter() && !initdone) CreatureSetup();
-    }
+        if (isEnabled
+            && !initdone
+            && firstTime
+            && IsValidToSpawnForCharacter()
+            && room.fullyLoaded
+            && room.ReadyForPlayer
+            && room.shortCutsReady)
+        {
+            var puppet = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC), null, blockPosition, room.game.GetNewID());
+            puppetWeakRef = new(puppet);
+            puppet.state = new PlayerNPCState(puppet, 0)
+            {
+                forceFullGrown = adult
+            };
+            room.abstractRoom.AddEntity(puppet);
 
-    private void CreatureSetup()
-    {
-        puppet = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC), null, blockPosition, room.game.GetNewID());
-        puppet.state = new PlayerNPCState(puppet, 0)
-        {
-            forceFullGrown = adult
-        };
-        room.abstractRoom.AddEntity(puppet);
-        puppet.RealizeInRoom();
-        puppetPlayer.controller = new SlugController(controllerID);
-        puppetPlayer.standing = true;
-        var HSL = RWCustom.Custom.RGB2HSL(color);
-        var stats = puppetPlayer.npcStats;
-        stats.Dark = false;
-        stats.H = HSL.x;
-        stats.S = HSL.y;
-        stats.L = HSL.z;
-        if (puppetPlayer.graphicsModule is PlayerGraphics g)
-        {
-            //i haven't figured out how to paint slugNPCs properly in update, but there were two methods that handled it
-            //both conditional. one required darkenFactor to be above zero so here we are
-            g.darkenFactor = 0.01f;
+            SlugcatDataPackage slugcatDataPackage = new SlugcatDataPackage(color, adult, controllerID);
+            NPCHooks.characterStats.Add(puppet, slugcatDataPackage);
+
+            puppet.RealizeInRoom();
+
+            initdone = true;
         }
-        initdone = true;
+
+        //kill slugcat when controlling object is destroyed
+        if (initdone && !room.roomSettings.placedObjects.Contains(data.owner)) Destroy();
     }
     bool IsValidToSpawnForCharacter()
     {
@@ -148,16 +157,57 @@ public class ControlledSlugcat : UpdatableAndDeletable
 
 internal static class NPCHooks
 {
+    public static ConditionalWeakTable<AbstractCreature, SlugcatDataPackage> characterStats = new();
     public static void Hook()
     {
+        //replace last input with controller data package if it exists
         IL.Player.SleepUpdate += Player_SleepUpdate;
+        //using jolly coop's sleep variable i can make a check to make them sleep
         On.Player.SleepUpdate += Player_SleepUpdate1;
+        //apply existing character stats to abstract NPC on realization
+        On.AbstractCreature.Realize += AbstractCreature_Realize;
+    }
+
+    private static void AbstractCreature_Realize(On.AbstractCreature.orig_Realize orig, AbstractCreature self)
+    {
+        orig(self);
+        if(self.creatureTemplate.TopAncestor().type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC
+            && characterStats.TryGetValue(self, out var stats))
+        {
+            if (self.realizedCreature is Player puppetPlayer)
+            {
+                puppetPlayer.controller = new SlugController(stats.controllerID);
+                puppetPlayer.standing = true;
+                var HSL = RWCustom.Custom.RGB2HSL(stats.color);
+                var NPCstats = puppetPlayer.npcStats;
+                NPCstats.Dark = false;
+                NPCstats.H = HSL.x;
+                NPCstats.S = HSL.y;
+                NPCstats.L = HSL.z;
+                if (puppetPlayer.graphicsModule is PlayerGraphics g)
+                {
+                    //i haven't figured out how to paint slugNPCs properly in update, but there were two methods that handled it
+                    //both conditional. one required darkenFactor to be above zero so here we are
+                    g.darkenFactor = 0.01f;
+                }
+            }
+            else MainLogic.logger.LogError("realizing PV slugcat but its realized creature is not Player. Expect no color change and controller assignment");
+            
+        }
     }
 
     private static void Player_SleepUpdate1(On.Player.orig_SleepUpdate orig, Player self)
     {
         orig(self);
-        if (!self.standing && self.input[0].y < 0 && !self.input[0].jmp && !self.input[0].thrw && !self.input[0].pckp && self.IsTileSolid(1, 0, -1) && (self.input[0].x == 0 || ((!self.IsTileSolid(1, -1, -1) || !self.IsTileSolid(1, 1, -1)) && self.IsTileSolid(1, self.input[0].x, 0))))
+        if (!self.standing 
+            && self.input[0].y < 0 
+            && !self.input[0].jmp 
+            && !self.input[0].thrw 
+            && !self.input[0].pckp 
+            && self.IsTileSolid(1, 0, -1) 
+            && (self.input[0].x == 0 
+                || ((!self.IsTileSolid(1, -1, -1) 
+                        || !self.IsTileSolid(1, 1, -1)) && self.IsTileSolid(1, self.input[0].x, 0))))
         {
             self.emoteSleepCounter += 0.028f;
         }
@@ -203,4 +253,18 @@ internal static class NPCHooks
             c.MarkLabel(jump);
         }
     }
+}
+
+internal class SlugcatDataPackage
+{
+    public SlugcatDataPackage(UnityEngine.Color color, bool adult, string controllerID)
+    {
+        this.color = color;
+        this.adult = adult;
+        this.controllerID = controllerID;
+    }
+    public UnityEngine.Color color;
+    public bool adult;
+    public string controllerID;
+    
 }
