@@ -12,7 +12,7 @@ public class InternalSoundController : IReceiveWorldTicks
     {
         weakRefGame = new WeakReference<RainWorldGame>(game);
     }
- 
+
     public WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
     public WeakReference<RainWorldGame> weakRefGame;
     public bool SlatedForDeletion => !weakRefGame.TryGetTarget(out _);
@@ -31,12 +31,12 @@ public class InternalSoundController : IReceiveWorldTicks
 
         if (exposedSoundController is not null)
         {
-            for(short i = 0; i < desiredVolumes.Length; i++)
+            for (short i = 0; i < desiredVolumes.Length; i++)
             {
                 desiredVolumes[i] = exposedSoundController.volumeSliders[i];
             }
         }
-        else desiredVolumes = [0,0,0,0];
+        else desiredVolumes = [0, 0, 0, 0];
 
 
         if (disembodiedLoopEmitters != null)
@@ -143,27 +143,27 @@ public class ExposedSoundController : UpdatableAndDeletable
 
     //ROM fields
     internal static ManagedField[] managedFields = [
-        new FloatField("FadeInSeconds", 
-            min: 0.1f,
-            max: 20f, 
-            defaultValue: 1f,
-            control: ManagedFieldWithPanel.ControlType.slider),
         new FloatField("linger",
             min: 0f,
             max: 20f,
             defaultValue: 0f,
             control: ManagedFieldWithPanel.ControlType.slider,
             displayName: "Linger"),
+        new FloatField("Melody 1", 0f, 1f, 0f),
+        new FloatField("Melody 2", 0f, 1f, 0f),
+        new FloatField("Melody 3", 0f, 1f, 0f),
+        new FloatField("Melody 4", 0f, 1f, 0f),
+        POMUtils.defaultVectorField,
+        new FloatField("FadeInSeconds",
+            min: 0.1f,
+            max: 20f,
+            defaultValue: 1f,
+            control: ManagedFieldWithPanel.ControlType.slider),
         new FloatField("FadeOutSeconds",
             min: 0.1f,
             max: 20f,
             defaultValue: 1f,
             control: ManagedFieldWithPanel.ControlType.slider),
-        new FloatField("Melody 1", 0f, 1f, 0f),
-        new FloatField("Melody 2", 0f, 1f, 0f),
-        new FloatField("Melody 3", 0f, 1f, 0f),
-        new FloatField("Melody 4", 0f, 1f, 0f),
-        POMUtils.defaultVectorField
     ];
 
     public Vector2[]? Polygon => POMUtils.AddRealPosition(data.GetValue<Vector2[]>("trigger zone"), pObj.pos);
@@ -174,7 +174,7 @@ public class ExposedSoundController : UpdatableAndDeletable
         data.GetValue<float>("Melody 4")];
     float FadeInTicks => data.GetValue<float>("FadeInSeconds") * 40;
     public float FadeInTickIncrement => 1f / FadeInTicks;
-    
+
     public float FadeOutTicks => data.GetValue<float>("FadeOutSeconds") * 40;
     public float FadeOutTickIncrement => 1f / FadeOutTicks;
     float linger => data.GetValue<float>("linger");
@@ -192,14 +192,14 @@ public class ExposedSoundController : UpdatableAndDeletable
         data = (pObj.data as ManagedData)!;
     }
 
-    bool PlayerInZone => Polygon is not null 
+    bool PlayerInZone => Polygon is not null
         && room.PlayersInRoom.Exists(Player => ROMUtils.PositionWithinPoly(Polygon, Player.mainBodyChunk.pos));
     public override void Update(bool eu)
     {
         base.Update(eu);
-        if(PlayerInZone)
+        if (PlayerInZone)
         {
-            if(MainLogic.internalSoundControllerRef.TryGetValue(room.game, out var intSoundController)
+            if (MainLogic.internalSoundControllerRef.TryGetValue(room.game, out var intSoundController)
                 && intSoundController.controllerReference != this)
             {
                 intSoundController.SetControllerReference(this, FadeInTickIncrement);
