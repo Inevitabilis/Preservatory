@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using static Pom.Pom;
-using static PVStuffMod.MainLogic;
 
 namespace PVStuffMod.Logic.POM_objects;
 /// <summary>
@@ -9,35 +8,59 @@ namespace PVStuffMod.Logic.POM_objects;
 /// </summary>
 public class InternalSoundController : IReceiveWorldTicks
 {
-    public WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
-    public ExposedSoundController? controllerReference;
-    public bool SlatedForDeletion => !weakRefGame.TryGetTarget(out _);
-    public WeakReference<RainWorldGame> weakRefGame;
     public InternalSoundController(RainWorldGame game)
     {
         weakRefGame = new WeakReference<RainWorldGame>(game);
+    }
+ 
+    public WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
+    public WeakReference<RainWorldGame> weakRefGame;
+    public bool SlatedForDeletion => !weakRefGame.TryGetTarget(out _);
+
+
+    public ExposedSoundController? controllerReference { get; private set; }
+    int ticksSinceCRefSet;
+    float fadeProgressionPerTick;
+    float[] volumesAtStartOfChange = [0, 0, 0, 0];
+    float[] desiredVolumes = [0, 0, 0, 0];
+    public void SetControllerReference(ExposedSoundController? exposedSoundController, float fadeProgressionPerTick)
+    {
+        controllerReference = exposedSoundController;
+        ticksSinceCRefSet = 0;
+        this.fadeProgressionPerTick = fadeProgressionPerTick;
+
+        if (exposedSoundController is not null)
+        {
+            for(short i = 0; i < desiredVolumes.Length; i++)
+            {
+                desiredVolumes[i] = exposedSoundController.volumeSliders[i];
+            }
+        }
+        else desiredVolumes = [0,0,0,0];
+
+
+        if (disembodiedLoopEmitters != null)
+        {
+            for (short i = 0; i < volumesAtStartOfChange.Length; i++)
+            {
+                if (disembodiedLoopEmitters[i].TryGetTarget(out var emitter))
+                {
+                    volumesAtStartOfChange[i] = emitter.volume;
+                }
+                else MainLogic.logger.LogError("InternalSoundController.SetControllerReference: weakref array at " + i + " was empty");
+            }
+        }
+        else MainLogic.logger.LogError("InternalSoundController.SetControllerReference: weakref array to loop emitters was null");
     }
 
 
     public void Update()
     {
-        SoundLoopMaintenance();
-        VolumeSlidersLogic();
-    }
-    DisembodiedLoopEmitter CreateNewSoundLoop(SoundID? soundID, float vol, float pitch, float pan)
-    {
-        DisembodiedLoopEmitter emitter = new(vol, pitch, pan);
-        if (weakRefGame.TryGetTarget(out var game))
-        {
-            PlayRoomlessDisembodiedLoop(game.cameras[0].virtualMicrophone, soundID, emitter, pan, vol, pitch);
-        }
-        return emitter;
-    }
-    void SoundLoopMaintenance()
-    {
         if (weakRefGame.TryGetTarget(out var game))
         {
             VirtualMicrophone virtualMicrophone = game.cameras[0].virtualMicrophone;
+
+            //create disembodied soundloops if they don't exist yet
             if (disembodiedLoopEmitters == null || !disembodiedLoopEmitters[0].TryGetTarget(out _))
             {
                 disembodiedLoopEmitters =
@@ -55,19 +78,29 @@ public class InternalSoundController : IReceiveWorldTicks
                     }
                 });
             }
-        }
-    }
-    void VolumeSlidersLogic()
-    {
-        if (disembodiedLoopEmitters == null) return;
-
-        for (short i = 0; i < disembodiedLoopEmitters.Length; i++)
-        {
-            if(disembodiedLoopEmitters[i].TryGetTarget(out var disembodiedLoopEmitter))
+            //sound logic
+            for (short i = 0; i < disembodiedLoopEmitters.Length; i++)
             {
-                disembodiedLoopEmitter.volume = Mathf.Lerp(disembodiedLoopEmitter.volume, controllerReference?.volumeSliders[i] ?? 0f, 0.1f);
+                if (disembodiedLoopEmitters[i].TryGetTarget(out var disembodiedLoopEmitter))
+                {
+                    var currentSCurveXProgression = Mathf.Min(ticksSinceCRefSet * fadeProgressionPerTick, 1f);
+                    var currentSCurveYProgression = RWCustom.Custom.SCurve(currentSCurveXProgression, 0.5f);
+                    disembodiedLoopEmitter.volume = Mathf.Lerp(volumesAtStartOfChange[i], desiredVolumes[i], currentSCurveYProgression);
+                }
             }
         }
+        ticksSinceCRefSet++;
+    }
+
+
+    DisembodiedLoopEmitter CreateNewSoundLoop(SoundID? soundID, float vol, float pitch, float pan)
+    {
+        DisembodiedLoopEmitter emitter = new(vol, pitch, pan);
+        if (weakRefGame.TryGetTarget(out var game))
+        {
+            PlayRoomlessDisembodiedLoop(game.cameras[0].virtualMicrophone, soundID, emitter, pan, vol, pitch);
+        }
+        return emitter;
     }
     static void PlayRoomlessDisembodiedLoop(VirtualMicrophone mic, SoundID? soundId, DisembodiedLoopEmitter emitter, float pan, float vol, float pitch)
     {
@@ -103,8 +136,6 @@ public class InternalSoundController : IReceiveWorldTicks
 public class ExposedSoundController : UpdatableAndDeletable
 {
     #region fields
-    //ROM fields
-
     public static void RegisterObject()
     {
         RegisterFullyManagedObjectType(managedFields, typeof(ExposedSoundController), "PVSoundController", StaticStuff.PreservatoryPOMCategory);
@@ -112,11 +143,26 @@ public class ExposedSoundController : UpdatableAndDeletable
 
     //ROM fields
     internal static ManagedField[] managedFields = [
-        new FloatField("linger", 0, float.PositiveInfinity, 0f, control: ManagedFieldWithPanel.ControlType.text),
-        new FloatField("Melody 1", 0, 1f, 0f),
-        new FloatField("Melody 2", 0, 1f, 0f),
-        new FloatField("Melody 3", 0, 1f, 0f),
-        new FloatField("Melody 4", 0, 1f, 0f),
+        new FloatField("FadeInSeconds", 
+            min: 0.1f,
+            max: 20f, 
+            defaultValue: 1f,
+            control: ManagedFieldWithPanel.ControlType.slider),
+        new FloatField("linger",
+            min: 0f,
+            max: 20f,
+            defaultValue: 0f,
+            control: ManagedFieldWithPanel.ControlType.slider,
+            displayName: "Linger"),
+        new FloatField("FadeOutSeconds",
+            min: 0.1f,
+            max: 20f,
+            defaultValue: 1f,
+            control: ManagedFieldWithPanel.ControlType.slider),
+        new FloatField("Melody 1", 0f, 1f, 0f),
+        new FloatField("Melody 2", 0f, 1f, 0f),
+        new FloatField("Melody 3", 0f, 1f, 0f),
+        new FloatField("Melody 4", 0f, 1f, 0f),
         POMUtils.defaultVectorField
     ];
 
@@ -126,9 +172,13 @@ public class ExposedSoundController : UpdatableAndDeletable
         data.GetValue<float>("Melody 2"),
         data.GetValue<float>("Melody 3"),
         data.GetValue<float>("Melody 4")];
-    public float linger => data.GetValue<float>("linger");
+    float FadeInTicks => data.GetValue<float>("FadeInSeconds") * 40;
+    public float FadeInTickIncrement => 1f / FadeInTicks;
+    
+    public float FadeOutTicks => data.GetValue<float>("FadeOutSeconds") * 40;
+    public float FadeOutTickIncrement => 1f / FadeOutTicks;
+    float linger => data.GetValue<float>("linger");
 
-    private const float RandomOffsetOnCreationMultiplier = 100f;
     private int lingerTimer;
 
     ManagedData data;
@@ -142,18 +192,25 @@ public class ExposedSoundController : UpdatableAndDeletable
         data = (pObj.data as ManagedData)!;
     }
 
+    bool PlayerInZone => Polygon is not null 
+        && room.PlayersInRoom.Exists(Player => ROMUtils.PositionWithinPoly(Polygon, Player.mainBodyChunk.pos));
     public override void Update(bool eu)
     {
         base.Update(eu);
-        if (lingerTimer > 0) lingerTimer--;
-        else if (internalSoundControllerRef.TryGetValue(room.game, out var internalSoundController) && internalSoundController.controllerReference == this) internalSoundController.controllerReference = null;
-        if (room.game.AlivePlayers.Exists(abstractCreature => abstractCreature.Room == room.abstractRoom
-        && abstractCreature.realizedCreature != null
-        && ROMUtils.PositionWithinPoly(Polygon, abstractCreature.realizedCreature.mainBodyChunk.pos))
-            && internalSoundControllerRef.TryGetValue(room.game, out var internalSoundController2))
+        if(PlayerInZone)
         {
-            internalSoundController2.controllerReference = this;
-            lingerTimer = (int)(linger * (float)StaticStuff.TicksPerSecond);
+            if(MainLogic.internalSoundControllerRef.TryGetValue(room.game, out var intSoundController)
+                && intSoundController.controllerReference != this)
+            {
+                intSoundController.SetControllerReference(this, FadeInTickIncrement);
+            }
+            lingerTimer = (int)(linger * StaticStuff.TicksPerSecond);
+        }
+        else
+        {
+            if (lingerTimer > 0) lingerTimer--;
+            else if (MainLogic.internalSoundControllerRef.TryGetValue(room.game, out var internalSoundController)
+                && internalSoundController.controllerReference == this) internalSoundController.SetControllerReference(null, FadeOutTickIncrement);
         }
     }
     #endregion
