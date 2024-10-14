@@ -79,7 +79,7 @@ public class Teleporter : UpdatableAndDeletable
                             flasher.RequestColorChange(Color.black);
                         };
                         flasher.TickInTheMiddleOfIdling += Teleportation;
-                        flasher.RequestScreenFlash(GetHashCode(), Color.white, ticksToFadeOut: 200, ticksToFadeIn: 100);
+                        flasher.RequestScreenFlash(GetHashCode(), room.game.cameras[0].virtualMicrophone, Color.white, ticksToFadeOut: 200, ticksToFadeIn: 100);
                     }
                     break;
                 }

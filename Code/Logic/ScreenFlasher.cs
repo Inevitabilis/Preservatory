@@ -10,6 +10,7 @@ namespace PVStuffMod.Logic;
 public class ScreenFlasher : IDrawable, IReceiveWorldTicks
 {
     int SummonerHash, ticksToFadeIn, ticksToFadeOut, idlingTicks, colorLerpingTicks;
+    VirtualMicrophone? microphone;
     Color color, previousColor, colorToLerpTo;
     State state = State.readyForAction;
     public bool SlatedForDeletion
@@ -85,6 +86,10 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             case State.fadingIn:
                 {
                     timer++;
+                    if(microphone != null)
+                    {
+                        microphone.globalSoundMuffle = FlareStrength;
+                    }
                     if (timer >= ticksToFadeIn)
                     {
                         timer = 0;
@@ -108,6 +113,10 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
             case State.fadingOut:
                 {
                     timer++;
+                    if (microphone != null)
+                    {
+                        microphone.globalSoundMuffle = FlareStrength;
+                    }
                     if (timer >= ticksToFadeOut)
                     {
                         timer = 0;
@@ -133,12 +142,14 @@ public class ScreenFlasher : IDrawable, IReceiveWorldTicks
 
     }
     public void RequestScreenFlash(int ownerHash,
+        VirtualMicrophone virtualMicrophone,
         Color color,
         int ticksToFadeIn = StaticStuff.TicksPerSecond * 1,
         int idleTicks = StaticStuff.TicksPerSecond * 3,
         int ticksToFadeOut = StaticStuff.TicksPerSecond * 1)
     {
         if (state != State.readyForAction) return;
+        this.microphone = virtualMicrophone;
         SummonerHash = ownerHash;
         this.ticksToFadeIn = ticksToFadeIn;
         idlingTicks = idleTicks;

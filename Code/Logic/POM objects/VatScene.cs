@@ -63,7 +63,7 @@ public class VatScene : UpdatableAndDeletable
                         state = State.flashCommencing;
                         ScreenFlasher flasher = StaticStuff.RegisterScreenFlasher(room.game.cameras[0]);
                         flasher.TickInTheMiddleOfIdling += Ending;
-                        flasher.RequestScreenFlash(this.GetHashCode(), Color.black);
+                        flasher.RequestScreenFlash(this.GetHashCode(), room.game.cameras[0].virtualMicrophone, Color.black);
                     }
                     timer++;
                     break;
