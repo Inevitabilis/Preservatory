@@ -183,10 +183,6 @@ public class Teleporter : UpdatableAndDeletable
         });
         room.world.game.roomRealizer.followCreature = abstractCreatures[0];
         game.cameras[0].MoveCamera(room.realizedRoom, 0);
-        game.cameras[0].virtualMicrophone.AllQuiet();
-        game.cameras[0].virtualMicrophone.NewRoom(game.cameras[0].room);
-
-
     }
     #endregion
 
