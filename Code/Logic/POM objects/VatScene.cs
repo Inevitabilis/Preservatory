@@ -58,7 +58,7 @@ public class VatScene : UpdatableAndDeletable
                 }
             case State.timedIdle:
                 {
-                    if(timer == delayBeforeFlash * StaticStuff.TicksPerSecond)
+                    if(timer == (int)(delayBeforeFlash * StaticStuff.TicksPerSecond))
                     {
                         state = State.flashCommencing;
                         ScreenFlasher flasher = StaticStuff.RegisterScreenFlasher(room.game.cameras[0]);
