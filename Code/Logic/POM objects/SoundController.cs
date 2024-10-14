@@ -249,6 +249,7 @@ public class RoomlessDisembodiedLoop : VirtualMicrophone.SoundObject
         controller.lastSoundPlayingFrame = Time.frameCount;
         controller.soundStillPlaying = true;
         base.Update(timeStacker, timeSpeed);
+        aspi.alpf.cutoffFrequency = 22000f;
     }
 
     public DisembodiedLoopEmitter controller;
