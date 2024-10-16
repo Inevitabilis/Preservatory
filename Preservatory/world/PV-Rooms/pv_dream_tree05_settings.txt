@@ -7,6 +7,6 @@ Palette: 53
 EffectColorA: 0
 EffectColorB: 2
 Effects: Bloom-0.8152174-20-20, RockFlea-0.09782609-22-83, Beetle-0.3586957-19-137, 
-PlacedObjects: LightBeam><533.4088><168.8784><-107~415~66~487~281~-71~-667~310~0.4760868~0.5978261~0~0~None~0~0, LightSource><678.5607><206.5594><0.1521739~Environment~253~-42~50~86.60254~0~1~None~0~0, LightSource><545.5651><543.0609><0.1086956~Environment~393~-111~-400~-10.39746~0~1~None~0~0, LightSource><362.8087><431.5585><0.5434783~Environment~290~-27~371~97.60251~1~0~None~0~0, DangleFruit><458.5507><449.4435><390~-60~2~3, DangleFruit><521.6788><507.1605><277~-21~2~3, 
+PlacedObjects: LightBeam><533.4088><168.8784><-107~415~66~487~281~-71~-667~310~0.4760868~0.5978261~0~0~None~0~0, LightSource><678.5607><206.5594><0.1521739~Environment~253~-42~50~86.60254~0~1~None~0~0, LightSource><545.5651><543.0609><0.1086956~Environment~393~-111~-400~-10.39746~0~1~None~0~0, LightSource><362.8087><431.5585><0.5434783~Environment~290~-27~371~97.60251~1~0~None~0~0, DangleFruit><458.5507><449.4435><390~-60~1~1, DangleFruit><521.6788><507.1605><277~-21~1~1, Controlled slugcat><665.6188><488.4009><-203~-138~Sleep~False~C6ACD5~anyone~True, 
 AmbientSounds: OMNI><AM_ENV-Outside.ogg><53.22302><538.9482><0.5><1, SPOT><AM_ENV-LightWind.ogg><722.6025><519.1149><0.4021739><1><576.6025><417.1149><-146.3553><-143.3553><0><0.4260871, OMNI><SO_WAT-LilDrips.ogg><79.00195><461.3><0.3695652><1, 
 FadePalette: 20, 0.2173913
