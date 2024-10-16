@@ -16,7 +16,7 @@ public class InternalSoundController : IReceiveWorldTicks
     public WeakReference<DisembodiedLoopEmitter>[]? disembodiedLoopEmitters;
     public WeakReference<RainWorldGame> weakRefGame;
     public bool SlatedForDeletion => !weakRefGame.TryGetTarget(out _);
-
+    public bool ShouldWork;
 
     public ExposedSoundController? controllerReference { get; private set; }
     int ticksSinceCRefSet;
@@ -56,7 +56,19 @@ public class InternalSoundController : IReceiveWorldTicks
 
     public void Update()
     {
-        if (weakRefGame.TryGetTarget(out var game))
+        if(!ShouldWork 
+            && disembodiedLoopEmitters is not null 
+            && disembodiedLoopEmitters[0].TryGetTarget(out var emitter)
+            && weakRefGame.TryGetTarget(out var game1))
+        {
+            VirtualMicrophone vm1 = game1.cameras[0].virtualMicrophone;
+            foreach (var soundloopweakref in disembodiedLoopEmitters)
+            {
+                if (soundloopweakref.TryGetTarget(out var soundloopEmitter)) vm1.soundObjects.Remove(soundloopEmitter.currentSoundObject);
+            }
+        }
+
+        if (ShouldWork && weakRefGame.TryGetTarget(out var game))
         {
             VirtualMicrophone virtualMicrophone = game.cameras[0].virtualMicrophone;
 

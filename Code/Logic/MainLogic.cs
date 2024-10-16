@@ -51,8 +51,9 @@ internal static class MainLogic
             #region internal sound controller
             if (internalSoundControllerRef.TryGetValue(self, out var controller))
 			{
-				controller.Update();
+				if(controller.ShouldWork)	controller.Update();
 
+				//slated for deletion never works actually i believe
 				if(controller.SlatedForDeletion)
 				{
 					internalSoundControllerRef.Remove(self);
@@ -89,8 +90,17 @@ internal static class MainLogic
 		On.RainWorldGame.ctor += (orig, self, manager) =>
 		{
 			orig(self, manager);
-			internalSoundControllerRef.Add(self, new(self));
+			internalSoundControllerRef.Add(self, new(self) { ShouldWork = self.world.name == "PV"});
 			NPCHooks.lobotomizedAbstractCreatures.Add(self, new HashSet<int>());
+		};
+
+		On.OverWorld.LoadWorld += (orig, self, worldName, playerCharacterNumber, singleRoomWorld) =>
+		{
+			orig(self, worldName, playerCharacterNumber, singleRoomWorld);
+			if(internalSoundControllerRef.TryGetValue(self.game, out var internalSoundController))
+			{
+				internalSoundController.ShouldWork = self.activeWorld.name == "PV";
+			}
 		};
 
 
