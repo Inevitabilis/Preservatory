@@ -65,7 +65,7 @@ public static class StaticStuff
 {
     public static bool logging = false;
     public const int TicksPerSecond = 40;
-    public const bool devBuild = true;
+    public static bool devBuild = true;
     public const string PreservatoryPOMCategory = "Preservatory";
 
     public static void loginf(object e) => MainLogic.logger.LogInfo(e);

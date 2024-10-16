@@ -36,12 +36,19 @@ internal static class MainLogic
 	static internal void Startup()
 	{
 		if (initialized) return;
-		//Scene related changes
-		On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+
+		string PVpath = ModManager.ActiveMods.FirstOrDefault(x => x.id == "preservatory").path;
+		StaticStuff.devBuild = File.Exists(Path.Combine(PVpath, "devmode.txt"));
+        //Scene related changes
+        On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+		//Registering enums
 		PVEnums.Melody.Register();
 		PVEnums.NPCBehaviour.Register();
+		//starting up controller logic
 		_ControllerMeta.Startup();
+
         RegisterPOMObjects();
+		//starting up save system logic
         SaveManager.ApplyHooks();
         initialized = true;
         //for things that do not receive local updates
