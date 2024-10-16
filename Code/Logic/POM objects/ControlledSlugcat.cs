@@ -8,6 +8,7 @@ using MonoMod.Cil;
 using System;
 using PVStuffMod;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace PVStuff.Logic.POM_objects;
 
@@ -126,6 +127,8 @@ public class ControlledSlugcat : UpdatableAndDeletable
             && room.shortCutsReady)
         {
             var puppet = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC), null, blockPosition, room.game.GetNewID());
+            //adding to the list of abstract creatures that don't receive movement updates
+            if (NPCHooks.lobotomizedAbstractCreatures.TryGetValue(room.game, out var hashes)) hashes.Add(puppet.abstractAI.GetHashCode());
             puppetWeakRef = new(puppet);
             puppet.state = new PlayerNPCState(puppet, 0)
             {
@@ -166,6 +169,16 @@ internal static class NPCHooks
         On.Player.SleepUpdate += Player_SleepUpdate1;
         //apply existing character stats to abstract NPC on realization
         On.AbstractCreature.Realize += AbstractCreature_Realize;
+        //if existing slugNPCs abstractize, they happen to wander around. to prevent this, we ask it to not process abstract movement related logic
+        On.AbstractCreatureAI.Update += AbstractCreatureAI_Update;
+        
+    }
+
+    public static ConditionalWeakTable<RainWorldGame, HashSet<int>> lobotomizedAbstractCreatures = new();
+    private static void AbstractCreatureAI_Update(On.AbstractCreatureAI.orig_Update orig, AbstractCreatureAI self, int time)
+    {
+        if (lobotomizedAbstractCreatures.TryGetValue(self.world.game, out var hashset) && hashset.Contains(self.GetHashCode())) return;
+        orig(self,time);
     }
 
     private static void AbstractCreature_Realize(On.AbstractCreature.orig_Realize orig, AbstractCreature self)
