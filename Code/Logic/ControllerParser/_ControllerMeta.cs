@@ -9,9 +9,9 @@ namespace PVStuff.Logic.ControllerParser;
 
 internal static class _ControllerMeta
 {
-    public static void Startup()
-    {
-        SlugController.Hook();
-        if(StaticStuff.devBuild)    DebugPrintKeyboardInputs.Startup();
-    }
+	public static void Startup()
+	{
+		SlugController.Hook();
+		if(StaticStuff.devBuild)    DebugPrintKeyboardInputs.Startup();
+	}
 }

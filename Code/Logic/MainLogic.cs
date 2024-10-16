@@ -39,24 +39,24 @@ internal static class MainLogic
 
 		string PVpath = ModManager.ActiveMods.FirstOrDefault(x => x.id == "preservatory").path;
 		StaticStuff.devBuild = File.Exists(Path.Combine(PVpath, "devmode.txt"));
-        //Scene related changes
-        On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
+		//Scene related changes
+		On.Menu.MenuScene.BuildScene += MenuScene_BuildScene;
 		//Registering enums
 		PVEnums.Melody.Register();
 		PVEnums.NPCBehaviour.Register();
 		//starting up controller logic
 		_ControllerMeta.Startup();
 
-        RegisterPOMObjects();
+		RegisterPOMObjects();
 		//starting up save system logic
-        SaveManager.ApplyHooks();
-        initialized = true;
-        //for things that do not receive local updates
-        On.RainWorldGame.Update += static (orig, self) =>
+		SaveManager.ApplyHooks();
+		initialized = true;
+		//for things that do not receive local updates
+		On.RainWorldGame.Update += static (orig, self) =>
 		{
 			orig(self);
-            #region internal sound controller
-            if (internalSoundControllerRef.TryGetValue(self, out var controller))
+			#region internal sound controller
+			if (internalSoundControllerRef.TryGetValue(self, out var controller))
 			{
 				if(controller.ShouldWork)	controller.Update();
 
@@ -66,9 +66,9 @@ internal static class MainLogic
 					internalSoundControllerRef.Remove(self);
 				}
 			}
-            #endregion
-            #region screen flasher
-            if (screenFlasherRef.TryGetValue(self, out var flasher))
+			#endregion
+			#region screen flasher
+			if (screenFlasherRef.TryGetValue(self, out var flasher))
 			{
 				flasher.Update();
 
@@ -83,16 +83,16 @@ internal static class MainLogic
 					screenFlasherRef.Remove(self);
 				}
 			}
-            #endregion
-            #region debug
+			#endregion
+			#region debug
 			if(Input.GetKeyDown(KeyCode.K) && !keypressed)
 			{
 				Dump(self);
 			}
 			keypressed = Input.GetKeyDown(KeyCode.K);
-            #endregion
+			#endregion
 
-        };
+		};
 
 		On.RainWorldGame.ctor += (orig, self, manager) =>
 		{
@@ -144,7 +144,7 @@ internal static class MainLogic
 				}
 			}
 			else loginf("disembodied sound loops were null");
-        }
+		}
 		else loginf("associated sound controller not found");
 	}
 }

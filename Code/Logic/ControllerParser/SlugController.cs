@@ -62,12 +62,12 @@ internal class SlugController : Player.PlayerController
 	//shoutout to Bro for making this tenfold readable
 	ControlInstruction GetCurrentInput()
 	{
-        if (instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction)) //instant instructions are first priority
-        {
-            return InstantInstruction;
-        }
-        #region find next valid instruction if current has ended
-        while (spanInstrIndex < spannedControlInstructions.Count && InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.invalid) //if current instruction doesn't fit, find next
+		if (instantInstructions.TryGetValue(controllerTimer, out var InstantInstruction)) //instant instructions are first priority
+		{
+			return InstantInstruction;
+		}
+		#region find next valid instruction if current has ended
+		while (spanInstrIndex < spannedControlInstructions.Count && InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.invalid) //if current instruction doesn't fit, find next
 		{
 			spanInstrIndex++;
 		}
@@ -78,17 +78,17 @@ internal class SlugController : Player.PlayerController
 			if (endAction == EndAction.RepeatLastKey && controllerTimer >= tickLimit) return lastInstruction;
 			return new();
 		}
-        #endregion
+		#endregion
 
-        #region execute current instruction
-        //normal execution. if currently are no instant and no spanned actions, stand
-        if (InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.pending) return new();
+		#region execute current instruction
+		//normal execution. if currently are no instant and no spanned actions, stand
+		if (InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.pending) return new();
 		//finally, if current instruction is ongoing, work
 		else if (InstructionInRelationToTimer(CurrentSpanInstruction) == SpanInstrState.ongoing) return CurrentSpanInstruction;
-        #endregion
-        logerr($"controller {ID} couldn't recognize what to do. current timer: {controllerTimer}, tick limit: {tickLimit} current index: {spanInstrIndex} (out of {spannedControlInstructions.Count-1})");
+		#endregion
+		logerr($"controller {ID} couldn't recognize what to do. current timer: {controllerTimer}, tick limit: {tickLimit} current index: {spanInstrIndex} (out of {spannedControlInstructions.Count-1})");
 		return new();
-    }
+	}
 
 	private void EndLogic()
 	{
@@ -120,7 +120,7 @@ internal class SlugController : Player.PlayerController
 		invalid = 4
 	}
 
-    SpanInstrState InstructionInRelationToTimer(SpannedControlInstruction spanInstr)
+	SpanInstrState InstructionInRelationToTimer(SpannedControlInstruction spanInstr)
 	{
 		//when the instruction hasn't started, it is queued
 		if (spanInstr.span.start > controllerTimer) return SpanInstrState.pending;
