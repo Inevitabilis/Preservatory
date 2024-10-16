@@ -165,7 +165,7 @@ public static class PVMaps
     }
     static internal StaticStuff.Destination GetDreamDestination(this SlugcatStats.Name character)
     {
-        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = new(0,0) }; //yes the player actually needs to not be noticed, with hunter long legs replacing it
+        return dreamRoom.TryGetValue(character, out var roomName) ? roomName : new() { roomName = "PV_END", position = StaticStuff.centerOfOneScreenRoom }; //yes the player actually needs to not be noticed, with hunter long legs replacing it
     }
     static internal StaticStuff.Destination GetEndDestination(this SlugcatStats.Name character)
     {
