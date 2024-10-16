@@ -90,6 +90,7 @@ internal static class MainLogic
 		{
 			orig(self, manager);
 			internalSoundControllerRef.Add(self, new(self));
+			NPCHooks.lobotomizedAbstractCreatures.Add(self, new HashSet<int>());
 		};
 
 
