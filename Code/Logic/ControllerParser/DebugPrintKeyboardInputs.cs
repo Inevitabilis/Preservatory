@@ -17,6 +17,11 @@ internal static class DebugPrintKeyboardInputs
 	static int pressDelay = 0;
 	static bool logKeyboard;
 
+	static ControlInstruction lastInstruction = new();
+	static uint lastTickWithChangedInstruction = 0;
+	static uint tickCounter = 0;
+
+	static List<string> instructionReader = [];
 	public static void Startup()
 	{
 		On.RainWorldGame.Update += static (orig, self) =>
@@ -27,16 +32,32 @@ internal static class DebugPrintKeyboardInputs
 			if(Input.GetKeyDown(KeyCode.B) && pressDelay < 0)
 			{
 				pressDelay = ticksBetweenPresses;
+
+				if(logKeyboard)
+				{
+                    StaticStuff.loginf("the instructions of slugcat movement are: \n" + instructionReader.Aggregate(func: (acc, x) => acc += (x + "\n"), seed: ""));
+					//reset logging state
+					instructionReader = [];
+					lastInstruction = new();
+					lastTickWithChangedInstruction = 0;
+                }
 				logKeyboard = !logKeyboard;
 			}
 		};
 		On.RWInput.PlayerInput_int += static (orig, number) =>
 		{
 			Player.InputPackage result = orig(number);
-			if(logKeyboard)
+			if(logKeyboard && number == 0)
 			{
-				ControlInstruction instruction = new(result);
-				StaticStuff.loginf("input: " + instruction);
+				ControlInstruction thisTickInstruction = new(result);
+				if(thisTickInstruction.ToString() != lastInstruction.ToString())
+				{
+					instructionReader.Add($"{lastTickWithChangedInstruction}-{tickCounter}: {lastInstruction}".ToLower());
+					lastTickWithChangedInstruction = tickCounter;
+					lastInstruction = thisTickInstruction;
+				}
+				tickCounter++;
+				
 			}
 			return result;
 			
