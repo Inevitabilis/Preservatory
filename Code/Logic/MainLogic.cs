@@ -123,8 +123,16 @@ internal static class MainLogic
 	}
 	private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
 	{
-		if(self.menu is SlugcatSelectMenu && self.sceneID != null && (devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot,self.sceneID.GetCharacterFromSelectScene())))
-			self.sceneID = self.sceneID.GetCharacterFromSelectScene().GetSelectScreenSceneID();
+		if(self.menu is SlugcatSelectMenu
+			&& self.sceneID != null
+			&& self.owner is SlugcatSelectMenu.SlugcatPage page)
+		{
+			var owner = page.slugcatNumber;
+			if(devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot, owner ))
+			{
+                self.sceneID = owner.GetSelectScreenSceneID();
+            }
+		}			
 		orig(self);
 	}
 

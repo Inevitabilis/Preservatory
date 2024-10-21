@@ -99,35 +99,6 @@ public static class PVMaps
 			{ MoreSlugcatsEnums.SlugcatStatsName.Rivulet, PVEnums.Rivulet },
 			{ White, PVEnums.Survivor }
 		};
-		sceneNameMap = new()
-		{
-			{ Ghost_Yellow, Yellow },
-			{ Slugcat_Yellow, Yellow },
-			{ AltEnd_Monk, Yellow },
-			{ Ghost_Red, Red },
-			{ Slugcat_Red, Red },
-			{ Slugcat_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
-			{ End_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
-			{ AltEnd_Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
-			{ AltEnd_Gourmand_Full, MoreSlugcatsEnums.SlugcatStatsName.Gourmand },
-			{ End_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-			{ AltEnd_Spearmaster, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-			{ Slugcat_Spear, MoreSlugcatsEnums.SlugcatStatsName.Spear },
-			{ Slugcat_Artificer, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
-			{ Slugcat_Artificer_Robo, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
-			{ Slugcat_Artificer_Robo2, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
-			{ AltEnd_Artificer_Portrait, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
-			{ End_Artificer, MoreSlugcatsEnums.SlugcatStatsName.Artificer },
-			{ Slugcat_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
-			{ Slugcat_Rivulet_Cell, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
-			{ End_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
-			{ AltEnd_Rivulet, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
-			{ AltEnd_Rivulet_Robe, MoreSlugcatsEnums.SlugcatStatsName.Rivulet },
-			{ Slugcat_Saint, Saint },
-			{ SaintMaxKarma, Saint },
-			{ End_Saint, Saint },
-			{ Slugcat_White, SlugcatStats.Name.White }
-		};
 		dreamRoom = new()
 		{
 			{ Yellow, new() {roomName = "PV_DREAM_TREE03", position = new(306f, 269f) } },
@@ -145,8 +116,6 @@ public static class PVMaps
 	}
 
 	#region Maps
-	internal static Dictionary<MenuScene.SceneID, SlugcatStats.Name> sceneNameMap;
-
 	internal static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap;
 
 	internal static Dictionary<SlugcatStats.Name, StaticStuff.Destination> dreamRoom;
@@ -155,10 +124,6 @@ public static class PVMaps
 	#endregion
 
 	#region Methods
-	static internal SlugcatStats.Name GetCharacterFromSelectScene(this MenuScene.SceneID sceneID)
-	{
-		return sceneNameMap.TryGetValue(sceneID, out var name) ? name : White;
-	}
 	static internal MenuScene.SceneID GetSelectScreenSceneID(this SlugcatStats.Name character)
 	{
 		return nameSceneMap.TryGetValue(character, out var sceneID) ? sceneID : PVEnums.Survivor;
