@@ -116,11 +116,11 @@ public static class PVMaps
 	}
 
 	#region Maps
-	internal static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap;
+	public static Dictionary<SlugcatStats.Name, MenuScene.SceneID> nameSceneMap;
 
-	internal static Dictionary<SlugcatStats.Name, StaticStuff.Destination> dreamRoom;
+	public static Dictionary<SlugcatStats.Name, StaticStuff.Destination> dreamRoom;
 
-	internal static Dictionary<SlugcatStats.Name, StaticStuff.Destination> endRoom;
+	public static Dictionary<SlugcatStats.Name, StaticStuff.Destination> endRoom;
 	#endregion
 
 	#region Methods
