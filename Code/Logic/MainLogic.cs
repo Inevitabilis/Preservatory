@@ -130,8 +130,8 @@ internal static class MainLogic
 			var owner = page.slugcatNumber;
 			if(devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot, owner ))
 			{
-                self.sceneID = owner.GetSelectScreenSceneID();
-            }
+				self.sceneID = owner.GetSelectScreenSceneID();
+			}
 		}			
 		orig(self);
 	}
