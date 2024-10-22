@@ -1,16 +1,10 @@
-﻿using Menu;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Menu;
 using MoreSlugcats;
-using static SlugcatStats.Name;
-using static MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
-using static MoreSlugcats.MoreSlugcatsEnums.MenuSceneID;
-using static Menu.MenuScene.SceneID;
-using UnityEngine;
-using System.Runtime.InteropServices;
 using PVStuffMod.Logic;
-using IL.RWCustom;
-using Newtonsoft.Json.Serialization;
-using System;
+using UnityEngine;
+using static MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
+using static SlugcatStats.Name;
 
 namespace PVStuffMod;
 
@@ -142,7 +136,8 @@ public static class ROMUtils
 {
 	public static bool PositionWithinPoly(Vector2[] Polygon, Vector2 point)
 	{
-			bool result = true;
+		if (Polygon == null || Polygon.Length <= 1) return false;
+		bool result = true;
 		for (int i = 0; i < Polygon.Length; i++)
 		{
 			if (IsAboveEquationByTwoPoints(Polygon[i], Polygon[(i + 1) % Polygon.Length], point) 

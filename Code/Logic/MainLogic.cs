@@ -27,7 +27,7 @@ namespace PVStuffMod;
 
 internal static class MainLogic
 {
-	public static ManualLogSource logger => PVStuff.s_logger;
+	public static ManualLogSource logger => PVStuff.s_logger!;
 	public static ConditionalWeakTable<RainWorldGame, InternalSoundController> internalSoundControllerRef = new();
 	public static ConditionalWeakTable<RainWorldGame, ScreenFlasher> screenFlasherRef = new();
 

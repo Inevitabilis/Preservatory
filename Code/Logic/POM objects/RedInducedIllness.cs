@@ -70,7 +70,7 @@ public class RedInducedIllness : UpdatableAndDeletable
 					{
 						return (x.realizedCreature is Player p)
 						&& (p.slugcatStats.name == SlugcatStats.Name.Red)
-						&& ROMUtils.PositionWithinPoly(Polygon, x.realizedCreature.mainBodyChunk.pos);
+						&& ROMUtils.PositionWithinPoly(Polygon!, x.realizedCreature.mainBodyChunk.pos);
 					}))
 					{
 						state = State.tickingBeforeFiring;
