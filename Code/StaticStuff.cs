@@ -30,6 +30,30 @@ public static class PVEnums
 	public static MenuScene.SceneID Rivulet;
 	public static MenuScene.SceneID Hunter;
 
+	public static class Credits
+	{
+		public static void Register()
+		{
+			PVLogo = new(nameof(PVLogo), true);
+			PVCredits = new(nameof(PVCredits), true);
+
+			// Now do some sneaky stuff to put it just after InitialWait (that is, reorder the array)
+			var values = EndCredits.Stage.values;
+			for (int i = values.entries.Count - 1; i > 2; i--)
+			{
+				values.entries[i] = values.entries[i - 2];
+			}
+			values.entries[1] = PVLogo.value;
+			values.entries[2] = PVCredits.value;
+			EndCredits.Stage.valuesVersion++;
+		}
+
+		public static EndCredits.Stage? PVLogo;
+		public static EndCredits.Stage? PVCredits;
+
+		public static bool IsPVCredit(EndCredits.Stage stage) => stage == PVLogo || stage == PVCredits;
+	}
+
 
 	public static class Melody
 	{
