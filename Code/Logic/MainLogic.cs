@@ -27,7 +27,7 @@ namespace PVStuffMod;
 
 internal static class MainLogic
 {
-	public static ManualLogSource logger => PVStuff.s_logger;
+	public static ManualLogSource logger => PVStuff.s_logger!;
 	public static ConditionalWeakTable<RainWorldGame, InternalSoundController> internalSoundControllerRef = new();
 	public static ConditionalWeakTable<RainWorldGame, ScreenFlasher> screenFlasherRef = new();
 
@@ -44,12 +44,14 @@ internal static class MainLogic
 		//Registering enums
 		PVEnums.Melody.Register();
 		PVEnums.NPCBehaviour.Register();
+		PVEnums.Credits.Register();
 		//starting up controller logic
 		_ControllerMeta.Startup();
 
 		RegisterPOMObjects();
 		//starting up save system logic
 		SaveManager.ApplyHooks();
+		CreditHooks.ApplyHooks();
 		initialized = true;
 		//for things that do not receive local updates
 		On.RainWorldGame.Update += static (orig, self) =>

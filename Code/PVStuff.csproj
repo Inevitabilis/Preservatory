@@ -4,6 +4,7 @@
     <LangVersion>Latest</LangVersion>
 	<Company>M4rbleL1ne</Company>
 	<Nullable>enable</Nullable>
+	<PathMap>$(MSBuildProjectDirectory)=/$(SolutionName)</PathMap>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants);USEPOM</DefineConstants>

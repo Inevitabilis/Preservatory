@@ -14,6 +14,7 @@ internal class NonPlayerCenteredLogic
 		UpdateSaveState(game);
 		SetSelectScreen(game);
 		game.ExitGame(false, false);
+		CreditHooks.DoPVCredits = true;
 		game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 0);
 	}
 	private static void UpdateSaveState(RainWorldGame game)

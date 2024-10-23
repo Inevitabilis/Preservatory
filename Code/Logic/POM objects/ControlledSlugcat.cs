@@ -197,12 +197,14 @@ internal static class NPCHooks
 				NPCstats.H = HSL.x;
 				NPCstats.S = HSL.y;
 				NPCstats.L = HSL.z;
-				if (puppetPlayer.graphicsModule is PlayerGraphics g)
+
+				// it gets painted properly without setting darkenFactor
+				/*if (puppetPlayer.graphicsModule is PlayerGraphics g)
 				{
 					//i haven't figured out how to paint slugNPCs properly in update, but there were two methods that handled it
 					//both conditional. one required darkenFactor to be above zero so here we are
 					g.darkenFactor = 0.01f;
-				}
+				}*/
 			}
 			else MainLogic.logger.LogError("realizing PV slugcat but its realized creature is not Player. Expect no color change and controller assignment");
 			
