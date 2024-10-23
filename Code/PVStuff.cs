@@ -234,6 +234,7 @@ sealed class PVStuff : BaseUnityPlugin
                     var spr = sLeaser.sprites[self.SpriteHeadStart + 4];
                     spr.element = Futile.atlasManager.GetElementWithName("PV" + spr.element.name);
                 }
+                self.ApplyPalette(sLeaser, rCam, rCam.currentPalette);
             }
         };
         On.LizardAI.LurkTracker.Utility += static (orig, self) =>
