@@ -133,6 +133,12 @@ internal static class MainLogic
 			if(devBuild || SaveManager.TryGetValue(self.menu.manager.rainWorld.options.saveSlot, owner ))
 			{
 				self.sceneID = owner.GetSelectScreenSceneID();
+				var markGlow = page.markGlow;
+				var markSquare = page.markSquare;
+				markGlow?.RemoveFromContainer();
+				page.markGlow = null;
+				markSquare?.RemoveFromContainer();
+				page.markSquare = null;
 			}
 		}			
 		orig(self);
