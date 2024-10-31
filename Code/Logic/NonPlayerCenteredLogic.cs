@@ -17,6 +17,7 @@ internal class NonPlayerCenteredLogic
 		CreditHooks.DoPVCredits = true;
 		game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 0);
 	}
+
 	private static void UpdateSaveState(RainWorldGame game)
 	{
 		var saveStateNumber = game.GetStorySession.saveStateNumber;

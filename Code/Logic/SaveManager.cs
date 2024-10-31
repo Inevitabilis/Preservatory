@@ -35,10 +35,16 @@ internal static class SaveManager
 			EscapismEnding[self.rainWorld.options.saveSlot] = new();
 			UpdateDiskSave();
 		};
+		On.PlayerProgression.WipeSaveState += static (orig, self, test) =>
+		{
+			orig(self, test);
+			EscapismEnding[self.rainWorld.options.saveSlot]?.Remove(test);
+			UpdateDiskSave();
+		};
 	}
 	internal static void AppendSlugcat(int saveStateNumber, SlugcatStats.Name name)
 	{
-		if(!EscapismEnding[saveStateNumber].Contains(name)) EscapismEnding[saveStateNumber].Add(name);
+		EscapismEnding[saveStateNumber].Add(name);
 	}
 	internal static bool TryGetValue(int saveStateNumber, SlugcatStats.Name name)
 	{
