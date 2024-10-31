@@ -7,4 +7,6 @@
     {"name": "Stasis_Artificer_1",    "pos": [483, 184], "depth": 1.5, "shader": "Normal"},
   ],
   "idle_depths": [1.5],
+  "GlowPos": [433, 134],
+  "MarkPos": [433, 134]
 }
