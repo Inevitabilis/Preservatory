@@ -181,8 +181,8 @@ public class Teleporter : UpdatableAndDeletable
 				player.standing = true;
 			}
 		});
-		room.world.game.roomRealizer.followCreature = abstractCreatures[0];
-		game.cameras[0].MoveCamera(room.realizedRoom, 0);
+		if(abstractCreatures.Count > 0)	room.world.game.roomRealizer.followCreature = abstractCreatures[0];
+		if(game.cameras.Length > 0)	game.cameras[0].MoveCamera(room.realizedRoom, 0);
 	}
 	#endregion
 

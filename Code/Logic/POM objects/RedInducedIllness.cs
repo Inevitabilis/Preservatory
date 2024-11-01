@@ -177,7 +177,6 @@ public class Asthma : CosmeticSprite
 
 	private void PlayerInteraction()
 	{
-		MainLogic.logger.LogInfo("player interaction. aerobic level is " + redCat.aerobicLevel);
 		redCat.aerobicLevel = Mathf.Max(CurrentFitIntensity, redCat.aerobicLevel);
 		if(redCat.aerobicLevel >= .8f) redCat.exhausted = true;
 		redCat.SetMalnourished(malnourishing);
