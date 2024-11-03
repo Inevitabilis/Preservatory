@@ -44,6 +44,12 @@ internal static class SaveManager
 	}
 	internal static void AppendSlugcat(int saveStateNumber, SlugcatStats.Name name)
 	{
+		var saves = EscapismEnding;
+		if(saveStateNumber > saves.Length - 1)
+		{
+			Array.Resize(ref saves, saveStateNumber + 1);
+			Array.ForEach(saves, save => save ??= new());
+		}
 		EscapismEnding[saveStateNumber].Add(name);
 	}
 	internal static bool TryGetValue(int saveStateNumber, SlugcatStats.Name name)
