@@ -25,13 +25,13 @@ internal static class SaveManager
 	}
 	private static void extendSaveIfNecessary(int accessingNumber)
 	{
-        var saves = EscapismEnding;
-        if (accessingNumber > saves.Length - 1)
-        {
-            Array.Resize(ref saves, accessingNumber + 1);
-            Array.ForEach(saves, save => save ??= new());
-        }
-    }
+		var saves = EscapismEnding;
+		if (accessingNumber > saves.Length - 1)
+		{
+			Array.Resize(ref saves, accessingNumber + 1);
+			Array.ForEach(saves, save => save ??= new());
+		}
+	}
 	private static string PreservatoryDirectory => ModManager.ActiveMods.Find(x => x.enabled && x.name == "Preservatory").path;
 	private const string path = "saves";
 	private const string filename = "endings.json";
@@ -41,24 +41,31 @@ internal static class SaveManager
 		On.PlayerProgression.WipeAll += static (orig, self) =>
 		{
 			orig(self);
+			extendSaveIfNecessary(self.rainWorld.options.saveSlot);
 			EscapismEnding[self.rainWorld.options.saveSlot] = new();
 			UpdateDiskSave();
 		};
 		On.PlayerProgression.WipeSaveState += static (orig, self, test) =>
 		{
 			orig(self, test);
-			EscapismEnding[self.rainWorld.options.saveSlot]?.Remove(test);
-			UpdateDiskSave();
+			if(self.rainWorld.options.saveSlot >= 0)
+			{
+				extendSaveIfNecessary(self.rainWorld.options.saveSlot);
+				EscapismEnding[self.rainWorld.options.saveSlot]?.Remove(test);
+				UpdateDiskSave();
+			}
 		};
 	}
 	internal static void AppendSlugcat(int saveStateNumber, SlugcatStats.Name name)
 	{
+		if (saveStateNumber < 0) return;
 		extendSaveIfNecessary(saveStateNumber);
 		EscapismEnding[saveStateNumber].Add(name);
 	}
 	internal static bool TryGetValue(int saveStateNumber, SlugcatStats.Name name)
 	{
-		extendSaveIfNecessary(saveStateNumber);
+        if (saveStateNumber < 0) return false;
+        extendSaveIfNecessary(saveStateNumber);
 		return EscapismEnding[saveStateNumber].Contains(name);
 	}
 	internal static void LoadData()
