@@ -23,6 +23,15 @@ internal static class SaveManager
 
 		private set => save = value;
 	}
+	private static void extendSaveIfNecessary(int accessingNumber)
+	{
+        var saves = EscapismEnding;
+        if (accessingNumber > saves.Length - 1)
+        {
+            Array.Resize(ref saves, accessingNumber + 1);
+            Array.ForEach(saves, save => save ??= new());
+        }
+    }
 	private static string PreservatoryDirectory => ModManager.ActiveMods.Find(x => x.enabled && x.name == "Preservatory").path;
 	private const string path = "saves";
 	private const string filename = "endings.json";
@@ -44,16 +53,12 @@ internal static class SaveManager
 	}
 	internal static void AppendSlugcat(int saveStateNumber, SlugcatStats.Name name)
 	{
-		var saves = EscapismEnding;
-		if(saveStateNumber > saves.Length - 1)
-		{
-			Array.Resize(ref saves, saveStateNumber + 1);
-			Array.ForEach(saves, save => save ??= new());
-		}
+		extendSaveIfNecessary(saveStateNumber);
 		EscapismEnding[saveStateNumber].Add(name);
 	}
 	internal static bool TryGetValue(int saveStateNumber, SlugcatStats.Name name)
 	{
+		extendSaveIfNecessary(saveStateNumber);
 		return EscapismEnding[saveStateNumber].Contains(name);
 	}
 	internal static void LoadData()
