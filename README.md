@@ -62,8 +62,8 @@ In order to only make Preservatory a soft dependency, extra precautions will be 
             PVMaps.nameSceneMap.Add(slugcat, "Your_Menu_Art_Scene_ID");
             PVMaps.dreamRoom.Add(slugcat, new StaticStuff.Destination()
             {
-                roomName = "PV_YourRoomHere", // you will need to add this room to PV
-                position = new Vector2(123f, 456f) // replace with precise coordinates in the room to spawn
+                roomName = "PV_DREAM_EXAMPLE01",
+                position = new Vector2(123f, 456f) // replace with precise coordinates in the room to spawn, use dev tools + M
             });
             
             // Ending room, if you happen to have one
