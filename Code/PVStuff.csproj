@@ -5,6 +5,8 @@
 	<Company>M4rbleL1ne</Company>
 	<Nullable>enable</Nullable>
 	<PathMap>$(MSBuildProjectDirectory)=/$(SolutionName)</PathMap>
+    <OutputPath>../Preservatory/newest/plugins</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants);USEPOM</DefineConstants>
@@ -15,7 +17,11 @@
 	  </Reference>
   </ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ProjectDir)../Preservatory/plugins/" />
+	<Target Name="GenerateMod" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<ItemGroup>
+			<RemovePlugins Include="../Preservatory/newest/plugins/*.pdb" />
+		</ItemGroup>
+
+		<Delete Files="@(RemovePlugins)" />
 	</Target>
 </Project>

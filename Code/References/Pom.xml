@@ -142,7 +142,7 @@
             <param name="Fields">A dictionary view containing all custom fields of this effect.</param>
             <returns></returns>
         </member>
-        <member name="M:EffExt.EffectDefinition.#ctor(DevInterface.RoomSettingsPage.DevEffectsCategories,System.String,EffExt.UADFactory,EffExt.EffectInitializer,System.Collections.ObjectModel.ReadOnlyDictionary{System.String,EffExt.EffectField})">
+        <member name="M:EffExt.EffectDefinition.#ctor(DevInterface.RoomSettingsPage.DevEffectsCategories,System.String,EffExt.UADFactory,EffExt.EffectInitializer,PomCore.ReadOnlyOrderedDictionary{System.String,EffExt.EffectField})">
             <summary>
             Custom data description for a room effect.
             </summary>
@@ -481,21 +481,50 @@
         <member name="P:EffExt.EStringField.DefaultString">
             <summary></summary>
         </member>
-        <member name="T:PomCore.Mod">
+        <member name="M:Pom.ItemSelectPanel.PanelSelectButton.IsSubButtonID(System.String,System.String@)">
             <summary>
-            This is ManagedPlacedObjects mini-framework, written by henpemaz
-            and ported to Downpour by Thalber. 
-            It is licensed under Creative Commons 0 and is designed
-            to be "stackable" at runtime with multiple instances of POM
-            in multiple mods. It is not recommended to do that anymore, but
-            you still can if you really want to.
+            detects if signal is from sub-button and if so, processes the actual item value
             </summary>
         </member>
-        <member name="M:PomCore.Mod.OnEnable">
-            <inheritdoc/>
+        <member name="M:Pom.StringControl.TextIsFloat(Pom.StringControl,System.String)">
+            <summary>
+            returns result of float.TryParse
+            </summary>
         </member>
-        <member name="M:PomCore.Mod.OnDisable">
-            <inheritdoc/>
+        <member name="M:Pom.StringControl.TextIsInt(Pom.StringControl,System.String)">
+            <summary>
+            returns result of int.TryParse
+            </summary>
+        </member>
+        <member name="M:Pom.StringControl.TextIsColor(Pom.StringControl,System.String)">
+            <summary>
+            returns true when text is valid hex color
+            </summary>
+        </member>
+        <member name="M:Pom.StringControl.TextIsExtEnum``1(Pom.StringControl,System.String)">
+            <summary>
+            returns true when text is ExtEnum
+            </summary>
+        </member>
+        <member name="M:Pom.StringControl.TextIsAny(Pom.StringControl,System.String)">
+            <summary>
+            always returns true
+            </summary>
+        </member>
+        <member name="M:Pom.StringControl.TextIsValidFilename(Pom.StringControl,System.String)">
+            <summary>
+            returns true if text could be a filename
+            </summary>
+        </member>
+        <member name="F:Pom.StringControl.StringEdit">
+            <summary>
+            signal value sent by <see cref="T:Pom.StringControl"/> when value is changed without editing
+            </summary>
+        </member>
+        <member name="F:Pom.StringControl.StringFinish">
+            <summary>
+            signal value sent by <see cref="T:Pom.StringControl"/> when editing mode is finished
+            </summary>
         </member>
         <member name="T:Pom.Pom">
             <summary>
@@ -759,6 +788,66 @@
             Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
             </summary>
             <param name="newValue">Current text</param>
+        </member>
+        <member name="T:Pom.Pom.ManagedItemSelect">
+            <summary>
+            A button that brings up a panel of all the selectable options
+            <see cref="T:Pom.Pom.IListablePanelField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedItemSelect.button">
+            <summary>
+            Contained button
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedItemSelect.field">
+            <summary>
+            Field definition
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedItemSelect.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedItemSelect.#ctor(Pom.Pom.ManagedFieldWithPanel,Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <param name="field">Field definition</param>
+            <param name="data">Data of the associated placedobject</param>
+            <param name="panel">Containing panel</param>
+            <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedItemSelect.Signal(DevInterface.DevUISignalType,DevInterface.DevUINode,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedRGBSelectButton">
+            <summary>
+            A button that brings up a color select panel
+            <see cref="T:Pom.Pom.IIterablePanelField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRGBSelectButton.button">
+            <summary>
+            Contained button
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRGBSelectButton.field">
+            <summary>
+            Field definition
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRGBSelectButton.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedRGBSelectButton.#ctor(Pom.Pom.ColorField,Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <param name="field">Field definition</param>
+            <param name="data">Data of the associated placedobject</param>
+            <param name="panel">Containing panel</param>
+            <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedRGBSelectButton.Signal(DevInterface.DevUISignalType,DevInterface.DevUINode,System.String)">
+            <inheritdoc/>
         </member>
         <member name="M:Pom.Pom.RegisterManagedObject(Pom.Pom.ManagedObjectType)">
             <summary>
@@ -1730,6 +1819,11 @@
             Value is controlled with a textbox
             </summary>
         </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.list">
+            <summary>
+            Value is controlled with a list panel that pops up when the button is clicked
+            </summary>
+        </member>
         <member name="M:Pom.Pom.ManagedFieldWithPanel.SizeOfPanelUiMinusName">
             <summary>
             Used internally for control panel display. 
@@ -2004,6 +2098,22 @@
             <inheritdoc/>
         </member>
         <member name="M:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:PomCore.Mod">
+            <summary>
+            This is ManagedPlacedObjects mini-framework, written by henpemaz
+            and ported to Downpour by Thalber. 
+            It is licensed under Creative Commons 0 and is designed
+            to be "stackable" at runtime with multiple instances of POM
+            in multiple mods. It is not recommended to do that anymore, but
+            you still can if you really want to.
+            </summary>
+        </member>
+        <member name="M:PomCore.Mod.OnEnable">
+            <inheritdoc/>
+        </member>
+        <member name="M:PomCore.Mod.OnDisable">
             <inheritdoc/>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">

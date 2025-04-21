@@ -100,12 +100,12 @@ internal static class MainLogic
 		{
 			orig(self, manager);
 			internalSoundControllerRef.Add(self, new(self) { ShouldWork = self.world.name == "PV"});
-			NPCHooks.lobotomizedAbstractCreatures.Add(self, new HashSet<int>());
+			NPCHooks.lobotomizedAbstractCreatures.Add(self, []);
 		};
 
-		On.OverWorld.LoadWorld += (orig, self, worldName, playerCharacterNumber, singleRoomWorld) =>
+		On.OverWorld.LoadWorld_string_Name_Timeline_bool += (orig, self, worldName, playerCharacterNumber, time, singleRoomWorld) =>
 		{
-			orig(self, worldName, playerCharacterNumber, singleRoomWorld);
+			orig(self, worldName, playerCharacterNumber, time, singleRoomWorld);
 			if(internalSoundControllerRef.TryGetValue(self.game, out var internalSoundController))
 			{
 				internalSoundController.ShouldWork = self.activeWorld.name == "PV";
@@ -114,7 +114,8 @@ internal static class MainLogic
 
 
 	}
-	static internal void RegisterPOMObjects()
+
+    static internal void RegisterPOMObjects()
 	{
 		HLL.RegisterObject();
 		RedInducedIllness.RegisterObject();
