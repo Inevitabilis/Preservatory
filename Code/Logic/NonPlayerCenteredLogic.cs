@@ -9,12 +9,13 @@ namespace PVStuffMod;
 internal class NonPlayerCenteredLogic
 {
 	internal static void BeatGameModeStasis(RainWorldGame game)
-	{
-		AppendStatistics(game);
+    {
+		CreditHooks.DoPVCredits = true;
+        SaveManager.RevertConsumedItems(game);
+        AppendStatistics(game);
 		UpdateSaveState(game);
 		SetSelectScreen(game);
 		game.ExitGame(false, false);
-		CreditHooks.DoPVCredits = true;
 		game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 0);
 	}
 
