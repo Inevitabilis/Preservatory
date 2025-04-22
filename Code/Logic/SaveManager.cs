@@ -74,7 +74,6 @@ internal static class SaveManager
 			SavedObjectCache = self.pendingObjects is not null ? [.. self.pendingObjects] : null!;
 			SwallowedItemsCache = self.swallowedItems is not null ? [.. self.swallowedItems] : null!;
 			UnrecognizedSwallowedItemsCache = self.unrecognizedSwallowedItems is not null ? [.. self.unrecognizedSwallowedItems] : null!;
-            PVStuffMod.PVStuff.s_logger!.LogDebug($"To save: {SavedCreatureCache is not null} {SavedObjectCache is not null} {SwallowedItemsCache is not null} {UnrecognizedSwallowedItemsCache is not null}");
         };
 		On.SaveState.SaveToString += static (orig, self) =>
 		{
@@ -84,11 +83,6 @@ internal static class SaveManager
 				if (SavedObjectCache is not null) self.pendingObjects = SavedObjectCache;
 				if (SwallowedItemsCache is not null) self.swallowedItems = [.. SwallowedItemsCache];
 				if (UnrecognizedSwallowedItemsCache is not null) self.unrecognizedSwallowedItems = UnrecognizedSwallowedItemsCache;
-				PVStuffMod.PVStuff.s_logger!.LogDebug($"Saved: {SavedCreatureCache is not null} {SavedObjectCache is not null} {SwallowedItemsCache is not null} {UnrecognizedSwallowedItemsCache is not null}");
-			}
-			else
-			{
-				PVStuffMod.PVStuff.s_logger!.LogDebug("Not PV ending, will not save");
 			}
 			return orig(self);
 		};
